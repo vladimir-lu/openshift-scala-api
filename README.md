@@ -1,0 +1,1 @@
+# WIP - Scala client of Openshift/Kubernetes API
