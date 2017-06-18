@@ -7,9 +7,6 @@ import org.http4s._
 import org.http4s.client.Client
 import org.http4s.headers.Authorization
 
-
-
-
 sealed trait ClusterToken
 case class BearerToken(token: String)
 
@@ -42,14 +39,11 @@ object OpenshiftCluster {
 
 }
 
-
-
 trait OpenshiftProject {
 
   def pods(): Task[Seq[Pod]]
 
 }
-
 
 private[client] class OpenshiftClient(client: Client, url: Uri, mkToken: => Credentials.Token) {
 
@@ -61,14 +55,10 @@ private[client] class OpenshiftClient(client: Client, url: Uri, mkToken: => Cred
   def listPods(projectId: ProjectId): Task[Seq[Pod]] =
     get[PodList](v1api / "namespaces" / projectId.id / "pods").map(_.items)
 
-
   // FIXME: handle unauthorized requests in a more principled fashion - perhaps a Task[Credentials.Token]?
   private def get[T](uri: Uri)(implicit D: Decoder[T]): Task[T] =
     client.expect(
-      Request(
-        method = Method.GET,
-        uri = uri,
-        headers = Headers(Authorization(mkToken)))
+      Request(method = Method.GET, uri = uri, headers = Headers(Authorization(mkToken)))
     )(jsonOf[T])
 }
 
@@ -80,7 +70,6 @@ object OpenshiftProject {
 
 }
 
-
 case class Pod(name: String)
 case class PodList(items: List[Pod])
 
@@ -88,8 +77,7 @@ object Decoders {
   implicit val decodePodList: Decoder[PodList] = Decoder.instance(c =>
     for {
       items <- c.downField("items").as[List[Pod]]
-    } yield PodList(items)
-  )
+    } yield PodList(items))
 
   implicit val decodePod: Decoder[Pod] = new Decoder[Pod] {
     final def apply(c: HCursor): Decoder.Result[Pod] =
@@ -100,7 +88,6 @@ object Decoders {
       }
   }
 }
-
 
 object TestApp extends App {
 
