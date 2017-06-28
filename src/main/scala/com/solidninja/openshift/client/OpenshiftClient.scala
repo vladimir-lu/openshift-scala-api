@@ -91,8 +91,8 @@ object Decoders {
 
 object TestApp extends App {
 
-  val url = Uri.uri("https://172.22.22.60:8443")
-  val token = BearerToken("C6wogF3DF2w3s4zANY5gqUbZXArR0sPsLhyyys3kZgs")
+  val url = Uri.uri("https://192.168.42.131:8443")
+  val token = BearerToken("KpgP-nf4CbPjlcaZIIA6BHAuGxndhbmjHaZKVYXNU_E")
   def mkToken = Credentials.Token(AuthScheme.Bearer, token.token)
 
   val res = for {

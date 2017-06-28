@@ -30,8 +30,8 @@ class ObjectMetaTest extends FreeSpec with Matchers {
       }"""
 
       val expected = ObjectMeta(
-        name = "mongodb-1-deploy",
-        namespace = Namespace("myproject"),
+        name = Some("mongodb-1-deploy"),
+        namespace = Some(Namespace("myproject")),
         labels = Map(
           "openshift.io/deployer-pod-for.name" -> "mongodb-1"
         ),
@@ -42,11 +42,8 @@ class ObjectMetaTest extends FreeSpec with Matchers {
           )),
         uid = Some(Uid("8d9731d0-51dd-11e7-8972-a434d9a39062")),
         resourceVersion = Some(Version("12034")),
-        creationTimestamp = Some(
-          Timestamp(
-            ZonedDateTime.of(2017, 6, 15, 15, 16, 6, 0, ZoneId.of("UTC")))),
-        selfLink =
-          Some(Path("/api/v1/namespaces/myproject/pods/mongodb-1-deploy"))
+        creationTimestamp = Some(Timestamp(ZonedDateTime.of(2017, 6, 15, 15, 16, 6, 0, ZoneId.of("UTC")))),
+        selfLink = Some(Path("/api/v1/namespaces/myproject/pods/mongodb-1-deploy"))
       )
 
       j.as[ObjectMeta] should equal(Right(expected))

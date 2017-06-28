@@ -54,10 +54,11 @@ class ContainerTest extends FreeSpec with Matchers {
       val expected = Container(
         args = None,
         command = None,
-        env = Some(List(
-          EnvVar("KUBERNETES_MASTER", "https://172.22.22.60:8443"),
-          EnvVar("OPENSHIFT_DEPLOYMENT_NAMESPACE", "myproject")
-        )),
+        env = Some(
+          List(
+            EnvVar("KUBERNETES_MASTER", "https://172.22.22.60:8443"),
+            EnvVar("OPENSHIFT_DEPLOYMENT_NAMESPACE", "myproject")
+          )),
         image = ImageName("openshift/origin-deployer:v1.5.1"),
         imagePullPolicy = "IfNotPresent"
       )

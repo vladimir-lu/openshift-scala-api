@@ -97,7 +97,7 @@ class PodTest extends FreeSpec with Matchers {
       )
 
       val podSpec = PodSpec(
-        volumes = Nil,
+        volumes = Some(Nil),
         containers = List(
           Container(
             image = ImageName("openshift/origin-deployer:v1.5.1"),

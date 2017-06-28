@@ -28,7 +28,7 @@ case class Pod(metadata: ObjectMeta, spec: PodSpec) extends V1Object
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#podspec-v1 PodSpec v1]]
   */
-case class PodSpec(volumes: List[Volume], containers: List[Container])
+case class PodSpec(volumes: Option[List[Volume]], containers: List[Container])
 
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#container-v1 Container v1]]
@@ -54,8 +54,8 @@ case class EnvVar(name: String, value: String)
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#objectmeta-v1 ObjectMeta v1]]
   */
-case class ObjectMeta(name: String,
-                      namespace: Namespace,
+case class ObjectMeta(name: Option[String],
+                      namespace: Option[Namespace],
                       labels: Map[String, String],
                       annotations: Annotations,
                       uid: Option[Uid],
@@ -65,8 +65,8 @@ case class ObjectMeta(name: String,
 
 object ObjectMeta {
   def apply(name: String, namespace: Namespace, labels: Map[String, String], annotations: Annotations): ObjectMeta =
-    ObjectMeta(name,
-               namespace,
+    ObjectMeta(Some(name),
+               Some(namespace),
                labels,
                annotations,
                uid = None,

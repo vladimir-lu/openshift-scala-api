@@ -40,7 +40,7 @@ class PodSpecTest extends FreeSpec with Matchers {
       }"""
 
       val expected = PodSpec(
-        volumes = Nil,
+        volumes = Some(Nil),
         containers = Container(
           args = None,
           command = None,
@@ -50,7 +50,7 @@ class PodSpecTest extends FreeSpec with Matchers {
         ) :: Nil
       )
 
-      j.as[PodSpec] should equal (Right(expected))
+      j.as[PodSpec] should equal(Right(expected))
     }
   }
 
