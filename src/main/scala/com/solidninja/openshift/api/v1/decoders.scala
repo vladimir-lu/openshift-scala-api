@@ -17,6 +17,13 @@ trait DecoderInstances extends com.solidninja.k8s.api.v1.DecoderInstances {
 
   implicit val decodePodTemplateSpec: Decoder[PodTemplateSpec] = deriveDecoder
 
+  implicit val decodeRouteTargetReference: Decoder[RouteTargetReference] = deriveDecoder
+
+  implicit val decodeRouteSpec: Decoder[RouteSpec] = deriveDecoder
+
+  implicit val decodeRoute: Decoder[Route] = deriveDecoder
+
+  implicit val decodeTopLevel: Decoder[TopLevel] = deriveDecoder
 }
 
 object Decoders extends DecoderInstances

@@ -2,7 +2,7 @@ package com.solidninja.k8s.api.v1
 
 import java.time.ZonedDateTime
 
-import io.circe.Json
+import io.circe.{Decoder, Encoder, Json}
 
 // FIXME: Incomplete mappings
 
@@ -16,7 +16,9 @@ case class ImageName(v: String) extends AnyVal {
   // TODO: mechanism for extracting version information?
 }
 
-trait V1Object {
+sealed trait TopLevel
+
+sealed trait V1Object extends TopLevel {
   val apiVersion = "v1"
 }
 
@@ -74,3 +76,13 @@ object ObjectMeta {
                creationTimestamp = None,
                selfLink = None)
 }
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#service-v1 Service v1]]
+  */
+case class Service(metadata: Option[ObjectMeta], spec: ServiceSpec) extends V1Object
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#servicespec-v1 ServiceSpec v1]]
+  */
+case class ServiceSpec()

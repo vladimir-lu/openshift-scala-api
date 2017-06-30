@@ -2,12 +2,19 @@ package com.solidninja.openshift.api.v1
 
 import com.solidninja.k8s.api.v1.{ObjectMeta, PodSpec}
 
+sealed trait TopLevel
+
+sealed trait V1Object extends TopLevel {
+  val apiVersion = "v1"
+}
+
 case class DeploymentConfigList(items: List[DeploymentConfig])
 
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-deploymentconfig v1 DeploymentConfig]]
   */
 case class DeploymentConfig(spec: DeploymentConfigSpec, status: DeploymentConfigStatus, meta: Option[ObjectMeta])
+    extends V1Object
 
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-deploymentconfigspec v1 DeploymentConfigSpec]]
@@ -37,3 +44,20 @@ case class DeploymentTriggerPolicy(`type`: String)
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-podtemplatespec v1 PodTemplateSpec]]
   */
 case class PodTemplateSpec(metadata: Option[ObjectMeta], spec: PodSpec)
+
+/**
+  * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-route v1 Route]]
+  */
+case class Route(metadata: Option[ObjectMeta], spec: RouteSpec) extends V1Object
+
+/**
+  * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-routespec RouteSpec v1 ]]
+  */
+case class RouteSpec(host: String, to: List[RouteTargetReference])
+
+/**
+  * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-routetargetreference RouteTargetReference v1]]
+  */
+case class RouteTargetReference(kind: String, name: String)
+// FIXME: Implement template
+//case class Template(test: Any = ???)
