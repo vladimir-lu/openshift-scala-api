@@ -49,6 +49,10 @@ trait DecoderInstances extends ValueInstances {
 
   implicit val decodeEnvVar: Decoder[EnvVar] = deriveDecoder
 
+  implicit val decodeServiceSpec: Decoder[ServiceSpec] = deriveDecoder
+
+  implicit val decodeService: Decoder[Service] = deriveDecoder
+
   implicit val decoder: Decoder[TopLevel] = deriveDecoder
 
 }
