@@ -32,14 +32,16 @@ class ObjectMetaTest extends FreeSpec with Matchers {
       val expected = ObjectMeta(
         name = Some("mongodb-1-deploy"),
         namespace = Some(Namespace("myproject")),
-        labels = Map(
-          "openshift.io/deployer-pod-for.name" -> "mongodb-1"
-        ),
-        annotations = Annotations(
+        labels = Some(
           Map(
-            "openshift.io/deployment.name" -> Json.fromString("mongodb-1"),
-            "openshift.io/scc" -> Json.fromString("restricted")
+            "openshift.io/deployer-pod-for.name" -> "mongodb-1"
           )),
+        annotations = Some(
+          Annotations(
+            Map(
+              "openshift.io/deployment.name" -> Json.fromString("mongodb-1"),
+              "openshift.io/scc" -> Json.fromString("restricted")
+            ))),
         uid = Some(Uid("8d9731d0-51dd-11e7-8972-a434d9a39062")),
         resourceVersion = Some(Version("12034")),
         creationTimestamp = Some(Timestamp(ZonedDateTime.of(2017, 6, 15, 15, 16, 6, 0, ZoneId.of("UTC")))),

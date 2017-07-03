@@ -11,7 +11,7 @@ import scala.util.Try
 private[v1] trait ValueInstances {
 
   implicit val decodeAnnotations: Decoder[Annotations] =
-    Decoder.decodeMapLike[Map, String, Json].map(Annotations)
+    Decoder.decodeMapLike[Map, String, Json].map(Annotations.apply)
 
   implicit val decodeTimestamp: Decoder[Timestamp] =
     Decoder.decodeString.emapTry(toTimestamp)
@@ -53,7 +53,14 @@ trait DecoderInstances extends ValueInstances {
 
   implicit val decodeService: Decoder[Service] = deriveDecoder
 
-  implicit val decoder: Decoder[TopLevel] = deriveDecoder
+  implicit val decodeK8sTopLevel: Decoder[TopLevel] = for {
+    kind <- Decoder[String].prepare(_.downField("kind"))
+    v <- kind match {
+      case "Pod" => Decoder[Pod]
+      case "Service" => Decoder[Service]
+      case kind => Decoder.failedWithMessage(s"Unknown k8s kind '$kind'")
+    }
+  } yield v
 
 }
 

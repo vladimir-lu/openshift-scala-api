@@ -161,13 +161,13 @@ class DeploymentConfigTest extends FreeSpec with Matchers {
               metadata = Some(ObjectMeta(
                 name = None,
                 namespace = None,
-                labels = Map(
+                labels = Some(Map(
                   "app" -> "dnsmasq",
                   "deploymentconfig" -> "dnsmasq"
-                ),
-                annotations = Annotations(
+                )),
+                annotations = Some(Annotations(
                   Map("openshift.io/generated-by" -> Json.fromString("OpenShiftWebConsole"))
-                ),
+                )),
                 uid = None,
                 resourceVersion = None,
                 creationTimestamp = None,

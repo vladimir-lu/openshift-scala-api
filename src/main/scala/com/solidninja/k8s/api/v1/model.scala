@@ -9,6 +9,11 @@ import io.circe.{Decoder, Encoder, Json}
 case class Timestamp(v: ZonedDateTime) extends AnyVal
 case class Namespace(v: String) extends AnyVal
 case class Annotations(v: Map[String, Json]) extends AnyVal
+
+object Annotations {
+  val empty: Annotations = Annotations(Map.empty)
+}
+
 case class Uid(v: String) extends AnyVal
 case class Version(v: String) extends AnyVal
 case class Path(v: String) extends AnyVal
@@ -25,7 +30,7 @@ sealed trait V1Object extends TopLevel {
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#pod-v1 Pod v1]]
   */
-case class Pod(metadata: ObjectMeta, spec: PodSpec) extends V1Object
+case class Pod(metadata: Option[ObjectMeta], spec: PodSpec) extends V1Object
 
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#podspec-v1 PodSpec v1]]
@@ -58,8 +63,8 @@ case class EnvVar(name: String, value: String)
   */
 case class ObjectMeta(name: Option[String],
                       namespace: Option[Namespace],
-                      labels: Map[String, String],
-                      annotations: Annotations,
+                      labels: Option[Map[String, String]],
+                      annotations: Option[Annotations],
                       uid: Option[Uid],
                       resourceVersion: Option[Version],
                       creationTimestamp: Option[Timestamp],
@@ -69,12 +74,23 @@ object ObjectMeta {
   def apply(name: String, namespace: Namespace, labels: Map[String, String], annotations: Annotations): ObjectMeta =
     ObjectMeta(Some(name),
                Some(namespace),
-               labels,
-               annotations,
+               Some(labels),
+               Some(annotations),
                uid = None,
                resourceVersion = None,
                creationTimestamp = None,
                selfLink = None)
+
+  val empty = ObjectMeta(
+    name = None,
+    namespace = None,
+    labels = None,
+    annotations = None,
+    uid = None,
+    resourceVersion = None,
+    creationTimestamp = None,
+    selfLink = None
+  )
 }
 
 /**

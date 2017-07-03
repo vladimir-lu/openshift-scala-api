@@ -53,7 +53,7 @@ case class Route(metadata: Option[ObjectMeta], spec: RouteSpec) extends V1Object
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-routespec RouteSpec v1 ]]
   */
-case class RouteSpec(host: String, to: List[RouteTargetReference])
+case class RouteSpec(host: String, to: RouteTargetReference)
 
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-routetargetreference RouteTargetReference v1]]
@@ -61,3 +61,7 @@ case class RouteSpec(host: String, to: List[RouteTargetReference])
 case class RouteTargetReference(kind: String, name: String)
 // FIXME: Implement template
 //case class Template(test: Any = ???)
+
+object TopLevel {
+  type EitherTopLevel = Either[TopLevel, com.solidninja.k8s.api.v1.TopLevel]
+}

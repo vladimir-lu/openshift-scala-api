@@ -110,7 +110,7 @@ class PodTest extends FreeSpec with Matchers {
       )
 
       val expected = Pod(
-        metadata = meta,
+        metadata = Some(meta),
         spec = podSpec
       )
 

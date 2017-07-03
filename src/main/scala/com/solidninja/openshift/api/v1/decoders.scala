@@ -1,7 +1,13 @@
 package com.solidninja.openshift.api.v1
 
+import com.solidninja.k8s.api.v1.{TopLevel => K8sTopLevel}
+
+import TopLevel.EitherTopLevel
 import io.circe._
 import io.circe.generic.semiauto._
+
+import cats.syntax.functor._
+import cats.syntax.either._
 
 trait DecoderInstances extends com.solidninja.k8s.api.v1.DecoderInstances {
 
@@ -23,7 +29,22 @@ trait DecoderInstances extends com.solidninja.k8s.api.v1.DecoderInstances {
 
   implicit val decodeRoute: Decoder[Route] = deriveDecoder
 
-  implicit val decodeTopLevel: Decoder[TopLevel] = deriveDecoder
+  implicit val decodeOapiTopLevel: Decoder[TopLevel] = for {
+    kind <- Decoder[String].prepare(_.downField("kind"))
+    v <- kind match {
+      case "DeploymentConfig" => Decoder[DeploymentConfig]
+      case "Route" => Decoder[Route]
+      case kind => Decoder.failedWithMessage(s"Unknown oapi kind '$kind'")
+    }
+  } yield v
+
+  // Thanks to https://github.com/circe/circe/issues/626
+
+  implicit val decodeEitherTopLevel: Decoder[EitherTopLevel] =
+    List[Decoder[EitherTopLevel]](
+      Decoder[K8sTopLevel].map(Either.right(_)),
+      Decoder[TopLevel].map(Either.left[TopLevel, K8sTopLevel](_))
+    ).reduceLeft(_ or _)
 }
 
 object Decoders extends DecoderInstances
