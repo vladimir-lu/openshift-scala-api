@@ -72,11 +72,7 @@ class TopLevelTest extends FreeSpec with Matchers {
               }
             }
           },
-          "status": {
-            "latestVersion": 0,
-            "observedGeneration": 0,
-            "replicas": 0
-          }
+          "status": null
         }
       ]}"""
 
@@ -114,11 +110,7 @@ class TopLevelTest extends FreeSpec with Matchers {
                 )
               ))
           ),
-          status = DeploymentConfigStatus(
-            latestVersion = 0,
-            observedGeneration = 0,
-            replicas = 0
-          )
+          status = None
         )
       )
 

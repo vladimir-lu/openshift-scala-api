@@ -13,7 +13,9 @@ case class DeploymentConfigList(items: List[DeploymentConfig])
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-deploymentconfig v1 DeploymentConfig]]
   */
-case class DeploymentConfig(spec: DeploymentConfigSpec, status: DeploymentConfigStatus, meta: Option[ObjectMeta])
+case class DeploymentConfig(spec: DeploymentConfigSpec,
+                            status: Option[DeploymentConfigStatus],
+                            meta: Option[ObjectMeta])
     extends V1Object
 
 /**

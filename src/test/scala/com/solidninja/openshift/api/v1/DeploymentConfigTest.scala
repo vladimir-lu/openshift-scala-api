@@ -188,7 +188,7 @@ class DeploymentConfigTest extends FreeSpec with Matchers {
               )
             ))
         ),
-        status = DeploymentConfigStatus(latestVersion = 1, observedGeneration = 2, replicas = 0),
+        status = Some(DeploymentConfigStatus(latestVersion = 1, observedGeneration = 2, replicas = 0)),
         meta = None
       )
 
