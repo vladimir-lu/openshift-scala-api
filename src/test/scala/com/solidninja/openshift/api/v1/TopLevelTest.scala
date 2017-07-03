@@ -87,7 +87,7 @@ class TopLevelTest extends FreeSpec with Matchers {
           )
         ),
         DeploymentConfig(
-          meta = None,
+          metadata = Some(ObjectMeta.empty),
           spec = DeploymentConfigSpec(
             strategy = DeploymentStrategy("Rolling"),
             triggers = Nil,

@@ -1,11 +1,11 @@
 package com.solidninja.openshift.api.v1
 
+import java.time.{ZoneId, ZonedDateTime}
+
 import Decoders._
 import com.solidninja.k8s.api.v1._
-
 import io.circe._
 import io.circe.literal._
-
 import org.scalatest.{FreeSpec, Matchers}
 
 class DeploymentConfigTest extends FreeSpec with Matchers {
@@ -189,7 +189,19 @@ class DeploymentConfigTest extends FreeSpec with Matchers {
             ))
         ),
         status = Some(DeploymentConfigStatus(latestVersion = 1, observedGeneration = 2, replicas = 0)),
-        meta = None
+        metadata = Some(
+          ObjectMeta(
+            name = Some("dnsmasq"),
+            namespace = Some(Namespace("myproject")),
+            labels = Some(Map("app" -> "dnsmasq")),
+            annotations = Some(
+              Annotations(Map("openshift.io/generated-by" -> Json.fromString("OpenShiftWebConsole")))
+            ),
+            uid = Some(Uid("823ede65-5c06-11e7-ab5a-c26606f097c1")),
+            resourceVersion = Some(Version("904")),
+            creationTimestamp = Some(Timestamp(ZonedDateTime.of(2017, 6, 28, 13, 34, 28, 0, ZoneId.of("UTC")))),
+            selfLink = Some(Path("/oapi/v1/namespaces/myproject/deploymentconfigs/dnsmasq"))
+          ))
       )
 
       j.as[DeploymentConfig] should equal(Right(expected))

@@ -23,7 +23,11 @@ case class ImageName(v: String) extends AnyVal {
 
 sealed trait TopLevel
 
-sealed trait V1Object extends TopLevel {
+trait HasMetadata {
+  def metadata: Option[ObjectMeta]
+}
+
+sealed trait V1Object extends TopLevel with HasMetadata {
   val apiVersion = "v1"
 }
 

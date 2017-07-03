@@ -4,21 +4,21 @@ import com.solidninja.k8s.api.v1.{ObjectMeta, PodSpec}
 
 sealed trait TopLevel
 
-sealed trait V1Object extends TopLevel {
+sealed trait V1Object extends TopLevel with HasMetadata {
   val apiVersion = "v1"
 }
 
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-deploymentconfiglist v1 DeploymentConfigList]]
   */
-case class DeploymentConfigList(metadata: Option[ObjectMeta], items: List[DeploymentConfig])
+case class DeploymentConfigList(metadata: Option[ObjectMeta], items: List[DeploymentConfig]) extends V1Object
 
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-deploymentconfig v1 DeploymentConfig]]
   */
 case class DeploymentConfig(spec: DeploymentConfigSpec,
                             status: Option[DeploymentConfigStatus],
-                            meta: Option[ObjectMeta])
+                            metadata: Option[ObjectMeta])
     extends V1Object
 
 /**
