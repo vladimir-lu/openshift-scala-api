@@ -2,11 +2,9 @@ package com.solidninja.openshift.api.v1
 
 import com.solidninja.k8s.api.v1.{TopLevel => K8sTopLevel}
 
-import TopLevel.EitherTopLevel
 import io.circe._
 import io.circe.generic.semiauto._
 
-import cats.syntax.functor._
 import cats.syntax.either._
 
 trait DecoderInstances extends com.solidninja.k8s.api.v1.DecoderInstances {

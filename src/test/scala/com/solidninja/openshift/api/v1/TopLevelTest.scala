@@ -1,11 +1,10 @@
 package com.solidninja.openshift.api.v1
 
-import com.solidninja.k8s.api.v1._
 import io.circe._
 import io.circe.literal._
 import org.scalatest.{FreeSpec, Matchers}
+import com.solidninja.k8s.api.v1._
 import Decoders._
-import com.solidninja.openshift.api.v1.TopLevel.EitherTopLevel
 
 class TopLevelTest extends FreeSpec with Matchers {
 

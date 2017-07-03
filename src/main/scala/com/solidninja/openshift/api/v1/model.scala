@@ -63,7 +63,3 @@ case class RouteSpec(host: String, to: RouteTargetReference)
 case class RouteTargetReference(kind: String, name: String)
 // FIXME: Implement template
 //case class Template(test: Any = ???)
-
-object TopLevel {
-  type EitherTopLevel = Either[TopLevel, com.solidninja.k8s.api.v1.TopLevel]
-}
