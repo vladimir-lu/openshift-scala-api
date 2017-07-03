@@ -55,6 +55,8 @@ trait DecoderInstances extends ValueInstances {
 
   implicit val decodeService: Decoder[Service] = deriveDecoder
 
+  implicit val decodeServiceList: Decoder[ServiceList] = deriveDecoder
+
   implicit val decodeK8sTopLevel: Decoder[TopLevel] = for {
     kind <- Decoder[String].prepare(_.downField("kind"))
     v <- kind match {

@@ -37,7 +37,6 @@ case class Pod(metadata: Option[ObjectMeta], spec: PodSpec) extends V1Object
   */
 case class PodList(metadata: Option[ObjectMeta], items: List[Pod]) extends V1Object
 
-
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#podspec-v1 PodSpec v1]]
   */
@@ -103,6 +102,11 @@ object ObjectMeta {
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#service-v1 Service v1]]
   */
 case class Service(metadata: Option[ObjectMeta], spec: ServiceSpec) extends V1Object
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#servicelist-v1 ServiceList v1]]
+  */
+case class ServiceList(metadata: Option[ObjectMeta], items: List[Service]) extends V1Object
 
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#servicespec-v1 ServiceSpec v1]]

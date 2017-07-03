@@ -56,6 +56,11 @@ case class PodTemplateSpec(metadata: Option[ObjectMeta], spec: PodSpec)
 case class Route(metadata: Option[ObjectMeta], spec: RouteSpec) extends V1Object
 
 /**
+  * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-routelist v1 RouteList]]
+  */
+case class RouteList(metadata: Option[ObjectMeta], items: List[Route]) extends V1Object
+
+/**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-routespec RouteSpec v1 ]]
   */
 case class RouteSpec(host: String, to: RouteTargetReference)

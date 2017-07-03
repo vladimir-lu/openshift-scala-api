@@ -29,6 +29,8 @@ trait DecoderInstances extends com.solidninja.k8s.api.v1.DecoderInstances {
 
   implicit val decodeRoute: Decoder[Route] = deriveDecoder
 
+  implicit val decodeRouteList: Decoder[RouteList] = deriveDecoder
+
   implicit val decodeOapiTopLevel: Decoder[TopLevel] = for {
     kind <- Decoder[String].prepare(_.downField("kind"))
     v <- kind match {

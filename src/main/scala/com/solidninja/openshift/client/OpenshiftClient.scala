@@ -4,7 +4,7 @@ import fs2.Task
 import com.solidninja.openshift.api.v1._
 import com.solidninja.openshift.client.impl.HttpOpenshiftCluster
 import org.http4s.client.Client
-import org.http4s._
+import org.http4s.{Service => HService, _}
 
 sealed trait ClusterToken
 
@@ -19,8 +19,9 @@ trait OpenshiftCluster {
 trait OpenshiftProject {
   def pods(): Task[Seq[Pod]]
   def deploymentConfigs(): Task[Seq[DeploymentConfig]]
+  def routes(): Task[Seq[Route]]
+  def services(): Task[Seq[Service]]
 }
-
 
 object OpenshiftCluster {
   import org.http4s.client.blaze._
@@ -37,7 +38,6 @@ object OpenshiftCluster {
 
 }
 
-
 object TestApp extends App {
 
   val url = Uri.uri("https://192.168.42.131:8443")
@@ -47,7 +47,7 @@ object TestApp extends App {
   val res = for {
     cluster <- OpenshiftCluster(url, mkToken, insecure = true)
     project <- cluster.project(ProjectId("myproject"))
-    dcs <- project.deploymentConfigs()
+    dcs <- project.services()
   } yield dcs
 
   println(res.unsafeRun())
