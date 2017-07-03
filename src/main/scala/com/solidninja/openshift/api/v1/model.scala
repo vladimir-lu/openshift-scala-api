@@ -8,7 +8,10 @@ sealed trait V1Object extends TopLevel {
   val apiVersion = "v1"
 }
 
-case class DeploymentConfigList(items: List[DeploymentConfig])
+/**
+  * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-deploymentconfiglist v1 DeploymentConfigList]]
+  */
+case class DeploymentConfigList(metadata: Option[ObjectMeta], items: List[DeploymentConfig])
 
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-deploymentconfig v1 DeploymentConfig]]

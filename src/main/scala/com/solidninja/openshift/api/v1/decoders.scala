@@ -11,6 +11,8 @@ trait DecoderInstances extends com.solidninja.k8s.api.v1.DecoderInstances {
 
   implicit val decodeDeploymentConfig: Decoder[DeploymentConfig] = deriveDecoder
 
+  implicit val decodeDeploymentConfigList: Decoder[DeploymentConfigList] = deriveDecoder
+
   implicit val decodeDeploymentConfigSpec: Decoder[DeploymentConfigSpec] = deriveDecoder
 
   implicit val decodeDeploymentConfigStatus: Decoder[DeploymentConfigStatus] = deriveDecoder

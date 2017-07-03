@@ -41,6 +41,8 @@ trait DecoderInstances extends ValueInstances {
 
   implicit val decodePod: Decoder[Pod] = deriveDecoder
 
+  implicit val decodePodList: Decoder[PodList] = deriveDecoder
+
   implicit val decodePodSpec: Decoder[PodSpec] = deriveDecoder
 
   implicit val decodeVolume: Decoder[Volume] = deriveDecoder

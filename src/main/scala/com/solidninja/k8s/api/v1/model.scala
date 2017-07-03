@@ -33,6 +33,12 @@ sealed trait V1Object extends TopLevel {
 case class Pod(metadata: Option[ObjectMeta], spec: PodSpec) extends V1Object
 
 /**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#podlist-v1 PodList v1]]
+  */
+case class PodList(metadata: Option[ObjectMeta], items: List[Pod]) extends V1Object
+
+
+/**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#podspec-v1 PodSpec v1]]
   */
 case class PodSpec(volumes: Option[List[Volume]], containers: List[Container])

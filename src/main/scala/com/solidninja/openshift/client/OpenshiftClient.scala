@@ -1,22 +1,26 @@
 package com.solidninja.openshift.client
 
 import fs2.Task
-import io.circe._
-import cats.syntax.either._
-import org.http4s._
+import com.solidninja.openshift.api.v1._
+import com.solidninja.openshift.client.impl.HttpOpenshiftCluster
 import org.http4s.client.Client
-import org.http4s.headers.Authorization
+import org.http4s._
 
 sealed trait ClusterToken
+
 case class BearerToken(token: String)
 
 case class ProjectId(id: String)
 
 trait OpenshiftCluster {
-
   def project(id: ProjectId): Task[OpenshiftProject]
-
 }
+
+trait OpenshiftProject {
+  def pods(): Task[Seq[Pod]]
+  def deploymentConfigs(): Task[Seq[DeploymentConfig]]
+}
+
 
 object OpenshiftCluster {
   import org.http4s.client.blaze._
@@ -28,78 +32,23 @@ object OpenshiftCluster {
     apply(url, mkToken, PooledHttp1Client(config = clientConfig))
   }
 
-  def apply(url: Uri, mkToken: => Credentials.Token, httpClient: Client): Task[OpenshiftCluster] = {
-    val client = new OpenshiftClient(httpClient, url, mkToken)
-    Task.now {
-      new OpenshiftCluster {
-        override def project(id: ProjectId): Task[OpenshiftProject] = Task.now(OpenshiftProject(client, id))
-      }
-    }
-  }
+  def apply(url: Uri, mkToken: => Credentials.Token, httpClient: Client): Task[OpenshiftCluster] =
+    Task.now(new HttpOpenshiftCluster(url, mkToken, httpClient))
 
 }
 
-trait OpenshiftProject {
-
-  def pods(): Task[Seq[Pod]]
-
-}
-
-private[client] class OpenshiftClient(client: Client, url: Uri, mkToken: => Credentials.Token) {
-
-  import Decoders._
-  import org.http4s.circe._
-
-  private val v1api = url / "api" / "v1"
-
-  def listPods(projectId: ProjectId): Task[Seq[Pod]] =
-    get[PodList](v1api / "namespaces" / projectId.id / "pods").map(_.items)
-
-  // FIXME: handle unauthorized requests in a more principled fashion - perhaps a Task[Credentials.Token]?
-  private def get[T](uri: Uri)(implicit D: Decoder[T]): Task[T] =
-    client.expect(
-      Request(method = Method.GET, uri = uri, headers = Headers(Authorization(mkToken)))
-    )(jsonOf[T])
-}
-
-object OpenshiftProject {
-
-  def apply(client: OpenshiftClient, projectId: ProjectId) = new OpenshiftProject {
-    override def pods(): Task[Seq[Pod]] = client.listPods(projectId)
-  }
-
-}
-
-case class Pod(name: String)
-case class PodList(items: List[Pod])
-
-object Decoders {
-  implicit val decodePodList: Decoder[PodList] = Decoder.instance(c =>
-    for {
-      items <- c.downField("items").as[List[Pod]]
-    } yield PodList(items))
-
-  implicit val decodePod: Decoder[Pod] = new Decoder[Pod] {
-    final def apply(c: HCursor): Decoder.Result[Pod] =
-      for {
-        name <- c.downField("metadata").downField("name").as[String]
-      } yield {
-        Pod(name)
-      }
-  }
-}
 
 object TestApp extends App {
 
   val url = Uri.uri("https://192.168.42.131:8443")
-  val token = BearerToken("KpgP-nf4CbPjlcaZIIA6BHAuGxndhbmjHaZKVYXNU_E")
+  val token = BearerToken("ghT_FZreqS11otg3xixmYugqENe-2ra1lH3wmf0crYE")
   def mkToken = Credentials.Token(AuthScheme.Bearer, token.token)
 
   val res = for {
     cluster <- OpenshiftCluster(url, mkToken, insecure = true)
     project <- cluster.project(ProjectId("myproject"))
-    pods <- project.pods()
-  } yield pods
+    dcs <- project.deploymentConfigs()
+  } yield dcs
 
   println(res.unsafeRun())
 }
