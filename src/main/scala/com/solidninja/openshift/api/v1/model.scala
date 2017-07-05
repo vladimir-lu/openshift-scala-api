@@ -69,5 +69,11 @@ case class RouteSpec(host: String, to: RouteTargetReference)
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-routetargetreference RouteTargetReference v1]]
   */
 case class RouteTargetReference(kind: String, name: String)
+
+/**
+  * List of items (kind: List) - comes from expansion of templates
+  */
+case class TemplateList(items: List[EitherTopLevel])
+
 // FIXME: Implement template
 //case class Template(test: Any = ???)

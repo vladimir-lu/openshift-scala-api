@@ -47,6 +47,8 @@ trait DecoderInstances extends com.solidninja.k8s.api.v1.DecoderInstances {
       Decoder[K8sTopLevel].map(Either.right(_)),
       Decoder[TopLevel].map(Either.left[TopLevel, K8sTopLevel](_))
     ).reduceLeft(_ or _)
+
+  implicit val decodeTemplateList: Decoder[TemplateList] = deriveDecoder
 }
 
 object Decoders extends DecoderInstances

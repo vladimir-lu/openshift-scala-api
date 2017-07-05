@@ -6,6 +6,8 @@ import java.time.format.DateTimeFormatter
 import io.circe._
 import io.circe.generic.semiauto._
 
+import cats.syntax.either._
+
 import scala.util.Try
 
 private[v1] trait ValueInstances {
@@ -49,7 +51,11 @@ trait DecoderInstances extends ValueInstances {
 
   implicit val decodeContainer: Decoder[Container] = deriveDecoder
 
-  implicit val decodeEnvVar: Decoder[EnvVar] = deriveDecoder
+  implicit val decodeEnvVar: Decoder[EnvVar] = Decoder.instance(c =>
+    for {
+      name <- c.get[String]("name")
+      value <- c.getOrElse[String]("value")("")
+    } yield EnvVar(name, value))
 
   implicit val decodeServiceSpec: Decoder[ServiceSpec] = deriveDecoder
 
