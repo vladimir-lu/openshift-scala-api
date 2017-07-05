@@ -5,7 +5,7 @@ import com.solidninja.openshift.api.v1._
 import com.solidninja.openshift.client._
 import fs2.{Strategy, Task}
 import fs2.async.immutable.Signal
-import io.circe.Decoder
+import io.circe.{Decoder, Json}
 import org.http4s.{Service => HService, _}
 import org.http4s.client._
 import org.http4s.headers.{Authorization, Location}
@@ -14,18 +14,37 @@ private[client] class HttpOpenshiftCluster(url: Uri, token: Signal[Task, Credent
     extends OpenshiftCluster {
   val client = new HttpOpenshiftClient(httpClient, url, token)
 
-  override def project(id: ProjectId): Task[OpenshiftProject] = Task.now(new HttpOpenshiftProject(client, id))
+  override def project(id: ProjectId): Task[OpenshiftProject with OpenshiftProjectRaw] =
+    Task.now(new HttpOpenshiftProject(client, id))
 }
 
 private[client] class HttpOpenshiftProject(client: HttpOpenshiftClient, projectId: ProjectId)
-    extends OpenshiftProject {
+    extends OpenshiftProject
+    with OpenshiftProjectRaw {
   override def pods(): Task[Seq[Pod]] = client.listPods(projectId)
+
+  override def pod(name: String): Task[Option[Pod]] = client.getPod(projectId, name)
 
   override def deploymentConfigs(): Task[Seq[DeploymentConfig]] = client.listDeploymentConfigs(projectId)
 
+  override def deploymentConfig(name: String): Task[Option[DeploymentConfig]] =
+    client.getDeploymentConfig(projectId, name)
+
   override def routes(): Task[Seq[Route]] = client.listRoutes(projectId)
 
+  override def route(name: String): Task[Option[Route]] = client.getRoute(projectId, name)
+
   override def services(): Task[Seq[Service]] = client.listServices(projectId)
+
+  override def service(name: String): Task[Option[Service]] = client.getService(projectId, name)
+
+  override def podRaw(name: String): Task[Option[Json]] = client.getPodRaw(projectId, name)
+
+  override def routeRaw(name: String): Task[Option[Json]] = client.getRouteRaw(projectId, name)
+
+  override def deploymentConfigRaw(name: String): Task[Option[Json]] = client.getDeploymentConfigRaw(projectId, name)
+
+  override def serviceRaw(name: String): Task[Option[Json]] = client.getServiceRaw(projectId, name)
 }
 
 private[client] class HttpOpenshiftClient(client: Client, url: Uri, token: Signal[Task, Credentials.Token]) {
@@ -42,17 +61,46 @@ private[client] class HttpOpenshiftClient(client: Client, url: Uri, token: Signa
   def listPods(projectId: ProjectId): Task[Seq[Pod]] =
     get[PodList](namespacek8s(projectId) / "pods").map(_.items)
 
+  def getPod(projectId: ProjectId, name: String): Task[Option[Pod]] =
+    getOpt[Pod](namespacek8s(projectId) / "pods" / name)
+
+  def getPodRaw(projectId: ProjectId, name: String): Task[Option[Json]] =
+    getOpt[Json](namespacek8s(projectId) / "pods" / name)
+
   def listServices(projectId: ProjectId): Task[Seq[Service]] =
     get[ServiceList](namespacek8s(projectId) / "services").map(_.items)
+
+  def getService(projectId: ProjectId, name: String): Task[Option[Service]] =
+    getOpt[Service](namespacek8s(projectId) / "services" / name)
+
+  def getServiceRaw(projectId: ProjectId, name: String): Task[Option[Json]] =
+    getOpt[Json](namespacek8s(projectId) / "services" / name)
 
   def listRoutes(projectId: ProjectId): Task[Seq[Route]] =
     get[RouteList](namespace(projectId) / "routes").map(_.items)
 
+  def getRoute(projectId: ProjectId, name: String): Task[Option[Route]] =
+    getOpt[Route](namespace(projectId) / "routes" / name)
+
+  def getRouteRaw(projectId: ProjectId, name: String): Task[Option[Json]] =
+    getOpt[Json](namespace(projectId) / "routes" / name)
+
   def listDeploymentConfigs(projectId: ProjectId): Task[Seq[DeploymentConfig]] =
     get[DeploymentConfigList](namespace(projectId) / "deploymentconfigs").map(_.items)
 
+  def getDeploymentConfig(projectId: ProjectId, name: String): Task[Option[DeploymentConfig]] =
+    getOpt[DeploymentConfig](namespace(projectId) / "deploymentconfigs" / name)
+
+  def getDeploymentConfigRaw(projectId: ProjectId, name: String): Task[Option[Json]] =
+    getOpt[Json](namespace(projectId) / "deploymentconfigs" / name)
+
+  private def getOpt[T: Decoder](uri: Uri): Task[Option[T]] =
+    get[T](uri).map(Option(_)).handle {
+      case UnexpectedStatus(Status.NotFound) => None
+    }
+
   // FIXME: handle unauthorized requests in a more principled fashion - perhaps a Task[Credentials.Token]?
-  private def get[T](uri: Uri)(implicit D: Decoder[T]): Task[T] =
+  private def get[T: Decoder](uri: Uri): Task[T] =
     for {
       tok <- token.get
       resp <- client.expect(
