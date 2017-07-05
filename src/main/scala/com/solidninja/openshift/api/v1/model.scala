@@ -33,7 +33,7 @@ case class DeploymentConfigSpec(strategy: DeploymentStrategy,
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-deploymentconfigstatus v1 DeploymentConfigStatus]]
   */
-case class DeploymentConfigStatus(latestVersion: Int, observedGeneration: Int, replicas: Int)
+case class DeploymentConfigStatus(latestVersion: Option[Int], observedGeneration: Option[Int], replicas: Option[Int])
 
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-deploymentstrategy v1 DeploymentStrategy]]

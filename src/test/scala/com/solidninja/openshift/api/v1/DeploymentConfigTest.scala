@@ -188,7 +188,8 @@ class DeploymentConfigTest extends FreeSpec with Matchers {
               )
             ))
         ),
-        status = Some(DeploymentConfigStatus(latestVersion = 1, observedGeneration = 2, replicas = 0)),
+        status =
+          Some(DeploymentConfigStatus(latestVersion = Some(1), observedGeneration = Some(2), replicas = Some(0))),
         metadata = Some(
           ObjectMeta(
             name = Some("dnsmasq"),
