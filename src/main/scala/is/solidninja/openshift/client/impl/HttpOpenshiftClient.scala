@@ -5,13 +5,16 @@ package impl
 
 import is.solidninja.k8s.api.v1.{PodList, ServiceList}
 import is.solidninja.openshift.api.v1._
-import is.solidninja.openshift.client._
 import fs2.{Strategy, Task}
 import fs2.async.immutable.Signal
-import io.circe.{Decoder, Json}
+import io.circe._
+import io.circe.syntax._
+import gnieh.diffson.circe._
+import gnieh.diffson.circe.DiffsonProtocol._
 import org.http4s.{Service => HService, _}
 import org.http4s.client._
 import org.http4s.headers.{Authorization, Location}
+import org.http4s.circe._
 
 private[client] class HttpOpenshiftCluster(url: Uri, token: Signal[Task, Credentials.Token], httpClient: Client)
     extends OpenshiftCluster {
@@ -48,6 +51,15 @@ private[client] class HttpOpenshiftProject(client: HttpOpenshiftClient, projectI
   override def deploymentConfigRaw(name: String): Task[Option[Json]] = client.getDeploymentConfigRaw(projectId, name)
 
   override def serviceRaw(name: String): Task[Option[Json]] = client.getServiceRaw(projectId, name)
+
+  override def patchDeploymentConfig(name: String, patch: JsonPatch): Task[DeploymentConfig] =
+    client.patchDeploymentConfig(projectId, name, patch)
+
+  override def patchRoute(name: String, patch: JsonPatch): Task[Route] =
+    client.patchRoute(projectId, name, patch)
+
+  override def patchService(name: String, patch: JsonPatch): Task[Service] =
+    client.patchService(projectId, name, patch)
 }
 
 private[client] class HttpOpenshiftClient(client: Client, url: Uri, token: Signal[Task, Credentials.Token]) {
@@ -97,22 +109,40 @@ private[client] class HttpOpenshiftClient(client: Client, url: Uri, token: Signa
   def getDeploymentConfigRaw(projectId: ProjectId, name: String): Task[Option[Json]] =
     getOpt[Json](namespace(projectId) / "deploymentconfigs" / name)
 
+  def patchDeploymentConfig(projectId: ProjectId, name: String, thePatch: JsonPatch): Task[DeploymentConfig] =
+    patch[DeploymentConfig](namespace(projectId) / "deploymentconfigs" / name, thePatch.asJson)
+
+  def patchService(projectId: ProjectId, name: String, thePatch: JsonPatch): Task[Service] =
+    patch[Service](namespace(projectId) / "services" / name, thePatch.asJson)
+
+  def patchRoute(projectId: ProjectId, name: String, thePatch: JsonPatch): Task[Route] =
+    patch[Route](namespace(projectId) / "routes" / name, thePatch.asJson)
+
   private def getOpt[T: Decoder](uri: Uri): Task[Option[T]] =
     get[T](uri).map(Option(_)).handle {
       case UnexpectedStatus(Status.NotFound) => None
     }
 
+  private def get[T: Decoder](uri: Uri): Task[T] = req[T](Request(method = Method.GET, uri = uri))
+
+  private def patch[T: Decoder](uri: Uri, patch: Json): Task[T] =
+    req[T](
+      Request(method = Method.PATCH, uri = uri)
+        .withBody(patch)
+        // override the content-type header
+        .map(_.putHeaders(Header("Content-Type", "application/json-patch+json")))
+    )
+
+  private def req[T: Decoder](reqT: Request): Task[T] = req[T](Task.now(reqT))
+
   // FIXME: handle unauthorized requests in a more principled fashion - perhaps a Task[Credentials.Token]?
-  private def get[T: Decoder](uri: Uri): Task[T] =
+  private def req[T: Decoder](reqT: Task[Request]): Task[T] =
     for {
       tok <- token.get
-      resp <- client.expect(
-        Request(
-          method = Method.GET,
-          uri = uri,
-          headers = Headers(Authorization(tok))
-        ))(jsonOf[T])
+      req <- reqT.map(_.putHeaders(Authorization(tok)))
+      resp <- client.expect(req)(jsonOf[T])
     } yield resp
+
 }
 
 object OAuthClusterLogin {

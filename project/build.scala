@@ -51,7 +51,6 @@ object build {
       "-unchecked",
       "-deprecation",
       "-feature",
-      "-optimize",
       "-language:existentials",
       "-language:implicitConversions",
       "-language:higherKinds",

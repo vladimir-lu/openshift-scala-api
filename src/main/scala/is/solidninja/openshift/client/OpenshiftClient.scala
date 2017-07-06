@@ -2,11 +2,18 @@ package is.solidninja
 package openshift
 package client
 
-import fs2.{Strategy, Task}
-import fs2.async.immutable.Signal
 import is.solidninja.openshift.api.v1._
 import is.solidninja.openshift.client.impl.{HttpOpenshiftCluster, OAuthClusterLogin}
-import io.circe.Json
+
+import io.circe._
+import io.circe.literal._
+
+import gnieh.diffson.circe._
+import gnieh.diffson._
+
+import fs2.{Strategy, Task}
+import fs2.async.immutable.Signal
+
 import org.http4s.client.Client
 import org.http4s.client.blaze.{BlazeClientConfig, PooledHttp1Client}
 import org.http4s.{Service => HService, _}
@@ -32,6 +39,9 @@ trait OpenshiftProject {
   def route(name: String): Task[Option[Route]]
   def services(): Task[Seq[Service]]
   def service(name: String): Task[Option[Service]]
+  def patchDeploymentConfig(name: String, patch: JsonPatch): Task[DeploymentConfig]
+  def patchRoute(name: String, patch: JsonPatch): Task[Route]
+  def patchService(name: String, patch: JsonPatch): Task[Service]
 }
 
 // TODO: experimental?
@@ -55,6 +65,7 @@ object OpenshiftCluster {
 
 }
 
+// FIXME - remove this
 object TestApp extends App {
 
   import ExecutionContext.Implicits.global
@@ -66,14 +77,18 @@ object TestApp extends App {
 
   val client = PooledHttp1Client(config = BlazeClientConfig.insecure)
 
+  val testPatch = JsonPatch(
+    Add(path = Pointer.root / "spec" / "template" / "spec" / "containers" / "0" / "env",
+        value = json"""[{"name":"TEST","value":"-Xfoo"}]""")
+  )
+
   val res = for {
     token <- OAuthClusterLogin.cache(OAuthClusterLogin.basic(client, url, credentials))
     cluster <- OpenshiftCluster(url, token, client)
     project <- cluster.project(ProjectId("myproject"))
-    dcs <- project.service("dnsmasq")
-    blah <- project.service("blah")
-    pods <- project.deploymentConfigRaw("dnsmasq")
-  } yield (pods)
+    dc <- project.deploymentConfig("dnsmasq")
+    patched <- project.patchDeploymentConfig("dnsmasq", testPatch)
+  } yield (dc, patched)
 
   println(res.unsafeRun())
 }
