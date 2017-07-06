@@ -5,16 +5,20 @@ package v1
 
 import is.solidninja.k8s.api.v1.{ObjectMeta, PodSpec}
 
-sealed trait TopLevel
+sealed trait TopLevel extends HasMetadata {
+  def kind: String
+}
 
-sealed trait V1Object extends TopLevel with HasMetadata {
+sealed trait V1Object extends TopLevel {
   val apiVersion = "v1"
 }
 
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-deploymentconfiglist v1 DeploymentConfigList]]
   */
-case class DeploymentConfigList(metadata: Option[ObjectMeta], items: List[DeploymentConfig]) extends V1Object
+case class DeploymentConfigList(metadata: Option[ObjectMeta], items: List[DeploymentConfig]) extends V1Object {
+  val kind = "DeploymentConfigList"
+}
 
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-deploymentconfig v1 DeploymentConfig]]
@@ -22,7 +26,9 @@ case class DeploymentConfigList(metadata: Option[ObjectMeta], items: List[Deploy
 case class DeploymentConfig(spec: DeploymentConfigSpec,
                             status: Option[DeploymentConfigStatus],
                             metadata: Option[ObjectMeta])
-    extends V1Object
+    extends V1Object {
+  val kind = "DeploymentConfig"
+}
 
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-deploymentconfigspec v1 DeploymentConfigSpec]]
@@ -56,12 +62,16 @@ case class PodTemplateSpec(metadata: Option[ObjectMeta], spec: PodSpec)
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-route v1 Route]]
   */
-case class Route(metadata: Option[ObjectMeta], spec: RouteSpec) extends V1Object
+case class Route(metadata: Option[ObjectMeta], spec: RouteSpec) extends V1Object {
+  val kind = "Route"
+}
 
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-routelist v1 RouteList]]
   */
-case class RouteList(metadata: Option[ObjectMeta], items: List[Route]) extends V1Object
+case class RouteList(metadata: Option[ObjectMeta], items: List[Route]) extends V1Object {
+  val kind = "RouteList"
+}
 
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-routespec RouteSpec v1 ]]

@@ -24,8 +24,6 @@ case class ImageName(v: String) extends AnyVal {
   // TODO: mechanism for extracting version information?
 }
 
-sealed trait TopLevel
-
 trait HasMetadata {
   def metadata: Option[ObjectMeta]
 }
@@ -37,19 +35,27 @@ object HasMetadata {
   }
 }
 
-sealed trait V1Object extends TopLevel with HasMetadata {
+sealed trait TopLevel extends HasMetadata {
+  def kind: String
+}
+
+sealed trait V1Object extends TopLevel {
   val apiVersion = "v1"
 }
 
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#pod-v1 Pod v1]]
   */
-case class Pod(metadata: Option[ObjectMeta], spec: PodSpec) extends V1Object
+case class Pod(metadata: Option[ObjectMeta], spec: PodSpec) extends V1Object {
+  val kind = "Pod"
+}
 
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#podlist-v1 PodList v1]]
   */
-case class PodList(metadata: Option[ObjectMeta], items: List[Pod]) extends V1Object
+case class PodList(metadata: Option[ObjectMeta], items: List[Pod]) extends V1Object {
+  val kind = "PodList"
+}
 
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#podspec-v1 PodSpec v1]]
@@ -115,12 +121,16 @@ object ObjectMeta {
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#service-v1 Service v1]]
   */
-case class Service(metadata: Option[ObjectMeta], spec: ServiceSpec) extends V1Object
+case class Service(metadata: Option[ObjectMeta], spec: ServiceSpec) extends V1Object {
+  val kind = "Service"
+}
 
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#servicelist-v1 ServiceList v1]]
   */
-case class ServiceList(metadata: Option[ObjectMeta], items: List[Service]) extends V1Object
+case class ServiceList(metadata: Option[ObjectMeta], items: List[Service]) extends V1Object {
+  val kind = "ServiceList"
+}
 
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#servicespec-v1 ServiceSpec v1]]
