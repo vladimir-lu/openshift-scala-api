@@ -30,6 +30,13 @@ trait HasMetadata {
   def metadata: Option[ObjectMeta]
 }
 
+object HasMetadata {
+
+  implicit class HasMetadataOps(val meta: HasMetadata) extends AnyVal {
+    def name: Option[String] = meta.metadata.flatMap(_.name)
+  }
+}
+
 sealed trait V1Object extends TopLevel with HasMetadata {
   val apiVersion = "v1"
 }

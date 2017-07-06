@@ -15,6 +15,7 @@ lazy val root = Project(
   id = "openshift-client",
   base = file("."),
   settings = Seq(
+    organization := "is.solidninja.openshift",
     scalaVersion := "2.11.11",
     libraryDependencies ++= libraries
   )
