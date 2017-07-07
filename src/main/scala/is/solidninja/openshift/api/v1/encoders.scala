@@ -32,12 +32,19 @@ trait EncoderInstances extends is.solidninja.k8s.api.v1.EncoderInstances {
 
   implicit val encodeRouteList: Encoder[RouteList] = deriveEncoder
 
-  implicit val encodeOapiTopLevel: Encoder[TopLevel] = deriveEncoder
+  implicit val encodeTemplateList: Encoder[TemplateList] = deriveEncoder[TemplateList].mapJsonObject(v1Object("List"))
+
+  implicit val encodeOapiTopLevel: Encoder[TopLevel] = Encoder.instance {
+    case dc: DeploymentConfig => dc.asJson
+    case dcl: DeploymentConfigList => dcl.asJson
+    case r: Route => r.asJson
+    case rl: RouteList => rl.asJson
+    case tl: TemplateList => tl.asJson // FIXME: not sure if this is valid - it's not in the spec
+  }
 
   implicit val encodeEitherTopLevel: Encoder[EitherTopLevel] = Encoder.instance {
     case Left(topLevel) => topLevel.asJson
     case Right(k8stopLevel) => k8stopLevel.asJson
   }
 
-  implicit val encodeTemplateList: Encoder[TemplateList] = deriveEncoder[TemplateList].mapJsonObject(v1Object("List"))
 }
