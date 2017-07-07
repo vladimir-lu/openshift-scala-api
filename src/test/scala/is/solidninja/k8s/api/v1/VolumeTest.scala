@@ -4,10 +4,11 @@ package api
 package v1
 
 import org.scalatest.{FreeSpec, Matchers}
+
 import io.circe._
 import io.circe.literal._
 
-import Decoders._
+import JsonProtocol._
 
 class VolumeTest extends FreeSpec with Matchers {
 
@@ -26,6 +27,7 @@ class VolumeTest extends FreeSpec with Matchers {
       )
 
       j.as[Volume] should equal(Right(expected))
+      // FIXME - add test for decoding back
     }
   }
 }

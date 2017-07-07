@@ -7,15 +7,16 @@ import java.time.{ZoneId, ZonedDateTime}
 
 import io.circe._
 import io.circe.literal._
+import io.circe.syntax._
 
 import org.scalatest.{FreeSpec, Matchers}
 
-import Decoders._
+import JsonProtocol._
 
 class ObjectMetaTest extends FreeSpec with Matchers {
 
   "ObjectMeta v1" - {
-    "should decode based on a simple example" in {
+    "should encode/decode based on a simple example" in {
       val j: Json = json"""{
         "name": "mongodb-1-deploy",
         "namespace": "myproject",
@@ -52,6 +53,7 @@ class ObjectMetaTest extends FreeSpec with Matchers {
       )
 
       j.as[ObjectMeta] should equal(Right(expected))
+      j.as[ObjectMeta].toTry.get.asJson should equal(j)
     }
   }
 

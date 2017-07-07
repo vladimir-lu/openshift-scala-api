@@ -6,8 +6,9 @@ package v1
 import org.scalatest.{FreeSpec, Matchers}
 import io.circe._
 import io.circe.literal._
+import io.circe.syntax._
 
-import Decoders._
+import JsonProtocol._
 
 class ContainerTest extends FreeSpec with Matchers {
 
@@ -67,6 +68,39 @@ class ContainerTest extends FreeSpec with Matchers {
       )
 
       j.as[Container] should equal(Right(expected))
+      // FIXME add a toJson test
+    }
+
+    "should encode from a simple example" in {
+      val container = Container(
+        args = None,
+        command = None,
+        env = Some(
+          List(
+            EnvVar("KUBERNETES_MASTER", "https://172.22.22.60:8443"),
+            EnvVar("OPENSHIFT_DEPLOYMENT_NAMESPACE", "myproject")
+          )),
+        image = ImageName("openshift/origin-deployer:v1.5.1"),
+        imagePullPolicy = "IfNotPresent"
+      )
+
+      container.asJson should equal(json"""{
+        "image" : "openshift/origin-deployer:v1.5.1",
+        "imagePullPolicy" : "IfNotPresent",
+        "args" : null,
+        "command" : null,
+        "env" : [
+          {
+            "name" : "KUBERNETES_MASTER",
+            "value" : "https://172.22.22.60:8443"
+          },
+          {
+            "name" : "OPENSHIFT_DEPLOYMENT_NAMESPACE",
+            "value" : "myproject"
+          }
+        ]
+      }""")
+      container.asJson.as[Container] should equal(Right(container))
     }
   }
 }

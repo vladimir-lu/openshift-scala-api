@@ -3,11 +3,14 @@ package openshift
 package api
 package v1
 
+import org.scalatest.{FreeSpec, Matchers}
+
+import is.solidninja.k8s.api.v1._
+
 import io.circe._
 import io.circe.literal._
-import org.scalatest.{FreeSpec, Matchers}
-import is.solidninja.k8s.api.v1._
-import Decoders._
+
+import JsonProtocol._
 
 class TopLevelTest extends FreeSpec with Matchers {
 
@@ -193,6 +196,7 @@ class TopLevelTest extends FreeSpec with Matchers {
       )
 
       j.hcursor.downField("items").as[List[EitherTopLevel]] should equal(Right(expected))
+      // FIXME - test for encoding back to json
     }
   }
 

@@ -39,7 +39,7 @@ trait DecoderInstances extends is.solidninja.k8s.api.v1.DecoderInstances {
     v <- kind match {
       case "DeploymentConfig" => Decoder[DeploymentConfig]
       case "Route" => Decoder[Route]
-      case kind => Decoder.failedWithMessage(s"Unknown oapi kind '$kind'")
+      case _ => Decoder.failedWithMessage(s"Unknown oapi kind '$kind'")
     }
   } yield v
 
@@ -53,5 +53,3 @@ trait DecoderInstances extends is.solidninja.k8s.api.v1.DecoderInstances {
 
   implicit val decodeTemplateList: Decoder[TemplateList] = deriveDecoder
 }
-
-object Decoders extends DecoderInstances

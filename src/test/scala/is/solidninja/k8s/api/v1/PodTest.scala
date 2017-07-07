@@ -4,10 +4,11 @@ package api
 package v1
 
 import org.scalatest.{FreeSpec, Matchers}
+
 import io.circe._
 import io.circe.literal._
 
-import Decoders._
+import JsonProtocol._
 
 class PodTest extends FreeSpec with Matchers {
 
@@ -118,6 +119,7 @@ class PodTest extends FreeSpec with Matchers {
       )
 
       j.as[Pod] should equal(Right(expected))
+      // FIXME - add test for serialization back to json
     }
   }
 

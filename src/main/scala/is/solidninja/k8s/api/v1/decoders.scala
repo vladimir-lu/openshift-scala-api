@@ -9,11 +9,9 @@ import java.time.format.DateTimeFormatter
 import io.circe._
 import io.circe.generic.semiauto._
 
-import cats.syntax.either._
-
 import scala.util.Try
 
-private[v1] trait ValueInstances {
+private[v1] trait ValueDecoderInstances {
 
   implicit val decodeAnnotations: Decoder[Annotations] =
     Decoder.decodeMapLike[Map, String, Json].map(Annotations.apply)
@@ -40,7 +38,7 @@ private[v1] trait ValueInstances {
 
 }
 
-trait DecoderInstances extends ValueInstances {
+trait DecoderInstances extends ValueDecoderInstances {
 
   implicit val decodeObjectMeta: Decoder[ObjectMeta] = deriveDecoder
 
@@ -76,5 +74,3 @@ trait DecoderInstances extends ValueInstances {
   } yield v
 
 }
-
-object Decoders extends DecoderInstances

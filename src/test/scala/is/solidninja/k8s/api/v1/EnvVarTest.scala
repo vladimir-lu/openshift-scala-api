@@ -6,8 +6,9 @@ package v1
 import org.scalatest.{FreeSpec, Matchers}
 
 import io.circe.literal._
+import io.circe.syntax._
 
-import Decoders._
+import JsonProtocol._
 
 class EnvVarTest extends FreeSpec with Matchers {
 
@@ -29,6 +30,15 @@ class EnvVarTest extends FreeSpec with Matchers {
       """
 
       j.as[EnvVar] should equal(Right(EnvVar("TEST", "")))
+    }
+
+    "be encodable" in {
+      val envVar = EnvVar(name = "TEST", value = "world")
+      envVar.asJson should equal(json"""{
+        "name" : "TEST",
+        "value" : "world"
+      }""")
+      envVar.asJson.as[EnvVar] should equal(Right(envVar))
     }
   }
 

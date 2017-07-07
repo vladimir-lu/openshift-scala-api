@@ -29,4 +29,5 @@ package object v1 {
   implicit def liftToEitherTopLevel(l: TopLevel): EitherTopLevel = Left(l)
   implicit def liftToEitherTopLevel(r: is.solidninja.k8s.api.v1.TopLevel): EitherTopLevel = Right(r)
 
+  object JsonProtocol extends EncoderInstances with DecoderInstances
 }

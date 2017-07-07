@@ -5,11 +5,14 @@ package v1
 
 import java.time.{ZoneId, ZonedDateTime}
 
-import Decoders._
-import is.solidninja.k8s.api.v1._
+import org.scalatest.{FreeSpec, Matchers}
+
 import io.circe._
 import io.circe.literal._
-import org.scalatest.{FreeSpec, Matchers}
+
+import JsonProtocol._
+
+import is.solidninja.k8s.api.v1._
 
 class DeploymentConfigTest extends FreeSpec with Matchers {
 
@@ -209,6 +212,7 @@ class DeploymentConfigTest extends FreeSpec with Matchers {
       )
 
       j.as[DeploymentConfig] should equal(Right(expected))
+      // FIXME - add test for encoding back to json
     }
   }
 

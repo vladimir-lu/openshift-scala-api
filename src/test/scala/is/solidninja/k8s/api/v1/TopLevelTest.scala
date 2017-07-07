@@ -3,11 +3,12 @@ package k8s
 package api
 package v1
 
-import io.circe._
-import io.circe.literal._
 import org.scalatest.{FreeSpec, Matchers}
 
-import Decoders._
+import io.circe._
+import io.circe.literal._
+
+import JsonProtocol._
 
 class TopLevelTest extends FreeSpec with Matchers {
 
@@ -89,6 +90,7 @@ class TopLevelTest extends FreeSpec with Matchers {
       )
 
       j.hcursor.downField("items").as[List[TopLevel]] should equal(Right(expected))
+      // FIXME - add encoding test back to json
     }
   }
 

@@ -4,19 +4,15 @@ package client
 
 import is.solidninja.openshift.api.v1._
 import is.solidninja.openshift.client.impl.{HttpOpenshiftCluster, OAuthClusterLogin}
-
 import io.circe._
 import io.circe.literal._
-
 import gnieh.diffson.circe._
 import gnieh.diffson._
-
 import fs2.{Strategy, Task}
 import fs2.async.immutable.Signal
-
+import org.http4s.{BasicCredentials, Credentials, Uri}
 import org.http4s.client.Client
 import org.http4s.client.blaze.{BlazeClientConfig, PooledHttp1Client}
-import org.http4s.{Service => HService, _}
 
 import scala.concurrent.ExecutionContext
 

@@ -4,10 +4,11 @@ package api
 package v1
 
 import org.scalatest.{FreeSpec, Matchers}
+
 import io.circe._
 import io.circe.literal._
 
-import Decoders._
+import JsonProtocol._
 
 class ServiceTest extends FreeSpec with Matchers {
 
@@ -79,6 +80,7 @@ class ServiceTest extends FreeSpec with Matchers {
       )
 
       j.as[Service] should equal(Right(expected))
+      // FIXME - test for conversion back to json
     }
   }
 

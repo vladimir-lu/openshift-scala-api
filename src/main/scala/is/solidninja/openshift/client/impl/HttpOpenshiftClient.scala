@@ -4,17 +4,16 @@ package client
 package impl
 
 import is.solidninja.k8s.api.v1.{PodList, ServiceList}
-import is.solidninja.openshift.api.v1._
+import is.solidninja.openshift.api.v1.{Service => v1Service, _}
 import fs2.{Strategy, Task}
 import fs2.async.immutable.Signal
 import io.circe._
 import io.circe.syntax._
 import gnieh.diffson.circe._
 import gnieh.diffson.circe.DiffsonProtocol._
-import org.http4s.{Service => HService, _}
+import org.http4s._
 import org.http4s.client._
 import org.http4s.headers.{Authorization, Location}
-import org.http4s.circe._
 
 private[client] class HttpOpenshiftCluster(url: Uri, token: Signal[Task, Credentials.Token], httpClient: Client)
     extends OpenshiftCluster {
@@ -40,9 +39,9 @@ private[client] class HttpOpenshiftProject(client: HttpOpenshiftClient, projectI
 
   override def route(name: String): Task[Option[Route]] = client.getRoute(projectId, name)
 
-  override def services(): Task[Seq[Service]] = client.listServices(projectId)
+  override def services(): Task[Seq[v1Service]] = client.listServices(projectId)
 
-  override def service(name: String): Task[Option[Service]] = client.getService(projectId, name)
+  override def service(name: String): Task[Option[v1Service]] = client.getService(projectId, name)
 
   override def podRaw(name: String): Task[Option[Json]] = client.getPodRaw(projectId, name)
 
@@ -58,13 +57,13 @@ private[client] class HttpOpenshiftProject(client: HttpOpenshiftClient, projectI
   override def patchRoute(name: String, patch: JsonPatch): Task[Route] =
     client.patchRoute(projectId, name, patch)
 
-  override def patchService(name: String, patch: JsonPatch): Task[Service] =
+  override def patchService(name: String, patch: JsonPatch): Task[v1Service] =
     client.patchService(projectId, name, patch)
 }
 
 private[client] class HttpOpenshiftClient(client: Client, url: Uri, token: Signal[Task, Credentials.Token]) {
 
-  import is.solidninja.openshift.api.v1.Decoders._
+  import JsonProtocol._
   import org.http4s.circe._
 
   private val v1k8s = url / "api" / "v1"
@@ -82,11 +81,11 @@ private[client] class HttpOpenshiftClient(client: Client, url: Uri, token: Signa
   def getPodRaw(projectId: ProjectId, name: String): Task[Option[Json]] =
     getOpt[Json](namespacek8s(projectId) / "pods" / name)
 
-  def listServices(projectId: ProjectId): Task[Seq[Service]] =
+  def listServices(projectId: ProjectId): Task[Seq[v1Service]] =
     get[ServiceList](namespacek8s(projectId) / "services").map(_.items)
 
-  def getService(projectId: ProjectId, name: String): Task[Option[Service]] =
-    getOpt[Service](namespacek8s(projectId) / "services" / name)
+  def getService(projectId: ProjectId, name: String): Task[Option[v1Service]] =
+    getOpt[v1Service](namespacek8s(projectId) / "services" / name)
 
   def getServiceRaw(projectId: ProjectId, name: String): Task[Option[Json]] =
     getOpt[Json](namespacek8s(projectId) / "services" / name)
@@ -112,8 +111,8 @@ private[client] class HttpOpenshiftClient(client: Client, url: Uri, token: Signa
   def patchDeploymentConfig(projectId: ProjectId, name: String, thePatch: JsonPatch): Task[DeploymentConfig] =
     patch[DeploymentConfig](namespace(projectId) / "deploymentconfigs" / name, thePatch.asJson)
 
-  def patchService(projectId: ProjectId, name: String, thePatch: JsonPatch): Task[Service] =
-    patch[Service](namespace(projectId) / "services" / name, thePatch.asJson)
+  def patchService(projectId: ProjectId, name: String, thePatch: JsonPatch): Task[v1Service] =
+    patch[v1Service](namespace(projectId) / "services" / name, thePatch.asJson)
 
   def patchRoute(projectId: ProjectId, name: String, thePatch: JsonPatch): Task[Route] =
     patch[Route](namespace(projectId) / "routes" / name, thePatch.asJson)

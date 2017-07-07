@@ -7,7 +7,7 @@ import org.scalatest.{FreeSpec, Matchers}
 
 import io.circe.literal._
 
-import Decoders._
+import JsonProtocol._
 
 class TemplateListTest extends FreeSpec with Matchers {
 
@@ -21,6 +21,7 @@ class TemplateListTest extends FreeSpec with Matchers {
       }"""
 
       j.as[TemplateList] should equal(Right(TemplateList(items = Nil)))
+      // FIXME - test for encoding back to json
     }
   }
 

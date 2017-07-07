@@ -48,17 +48,22 @@ object build {
     scalaVersion := "2.12.2",
     crossScalaVersions := Seq("2.11.11", "2.12.2"),
     scalacOptions ++= Seq(
-      "-unchecked",
       "-deprecation",
+      "-encoding",
+      "UTF-8",
       "-feature",
       "-language:existentials",
-      "-language:implicitConversions",
       "-language:higherKinds",
-      "-language:postfixOps",
+      "-language:implicitConversions",
+      "-unchecked",
+      "-Xfatal-warnings",
+      "-Xlint",
+      "-Yno-adapted-args",
+      "-Ywarn-dead-code",
+      "-Ywarn-numeric-widen",
+      "-Ywarn-value-discard",
       "-Xfuture",
-      "-Ywarn-unused-import",
-      "-Ywarn-unused"
-      // FIXME - add all the warnings possible
+      "-Ywarn-unused-import"
     ),
     javacOptions ++= Seq("-target", "1.8", "-source", "1.8"),
     manifestSetting,
