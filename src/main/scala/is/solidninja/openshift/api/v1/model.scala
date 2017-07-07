@@ -86,7 +86,9 @@ case class RouteTargetReference(kind: String, name: String)
 /**
   * List of items (kind: List) - comes from expansion of templates
   */
-case class TemplateList(items: List[EitherTopLevel])
+case class TemplateList(items: List[EitherTopLevel], metadata: Option[ObjectMeta] = None) extends V1Object {
+  val kind = "List"
+}
 
 // FIXME: Implement template
 //case class Template(test: Any = ???)

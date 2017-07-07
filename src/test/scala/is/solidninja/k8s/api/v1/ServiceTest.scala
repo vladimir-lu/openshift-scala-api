@@ -7,6 +7,7 @@ import org.scalatest.{FreeSpec, Matchers}
 
 import io.circe._
 import io.circe.literal._
+import io.circe.syntax._
 
 import JsonProtocol._
 
@@ -72,7 +73,16 @@ class ServiceTest extends FreeSpec with Matchers {
         selfLink = None
       )
 
-      val serviceSpec = ServiceSpec()
+      val serviceSpec = ServiceSpec(
+        `type` = "ClusterIP",
+        sessionAffinity = Some("None"),
+        selector = Some(Selector(Map("deploymentconfig" -> Json.fromString("dnsmasq")))),
+        ports = Some(
+          List(
+            ServicePort("53-tcp", Port(53), "TCP", Port(53)),
+            ServicePort("53-udp", Port(53), "UDP", Port(53))
+          ))
+      )
 
       val expected = Service(
         metadata = Some(meta),
@@ -80,7 +90,58 @@ class ServiceTest extends FreeSpec with Matchers {
       )
 
       j.as[Service] should equal(Right(expected))
-      // FIXME - test for conversion back to json
+//      j.as[Service].toTry.get.asJson should equal (j)
+    }
+
+    "should encode a simple service" in {
+      val meta = ObjectMeta(
+        name = Some("dnsmasq"),
+        labels = Some(
+          Map(
+            "app" -> "dnsmasq"
+          )),
+        annotations = Some(
+          Annotations(
+            Map(
+              "openshift.io/generated-by" -> Json.fromString("OpenShiftWebConsole")
+            )))
+      )
+
+      val service = Service(
+        metadata = Some(meta),
+        spec = ServiceSpec(
+          `type` = "ClusterIP"
+        )
+      )
+
+      service.asJson should equal(json"""{
+        "kind" : "Service",
+        "apiVersion" : "v1",
+        "metadata" : {
+          "name" : "dnsmasq",
+          "namespace" : null,
+          "labels" : {
+            "app" : "dnsmasq"
+          },
+          "annotations" : {
+            "openshift.io/generated-by" : "OpenShiftWebConsole"
+          },
+          "uid" : null,
+          "resourceVersion" : null,
+          "creationTimestamp" : null,
+          "selfLink" : null
+        },
+        "spec" : {
+          "type" : "ClusterIP",
+          "clusterIP" : null,
+          "externalIPs" : null,
+          "externalName" : null,
+          "loadBalancerIP" : null,
+          "ports" : null,
+          "selector" : null,
+          "sessionAffinity" : null
+        }
+      }""")
     }
   }
 

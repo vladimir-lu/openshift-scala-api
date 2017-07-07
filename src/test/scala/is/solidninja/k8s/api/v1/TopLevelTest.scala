@@ -85,7 +85,16 @@ class TopLevelTest extends FreeSpec with Matchers {
         ),
         Service(
           metadata = None,
-          spec = ServiceSpec()
+          spec = ServiceSpec(
+            `type` = "ClusterIP",
+            sessionAffinity = Some("None"),
+            selector = Some(Selector(Map("deploymentconfig" -> Json.fromString("dnsmasq")))),
+            ports = Some(
+              List(
+                ServicePort("53-tcp", Port(53), "TCP", Port(53)),
+                ServicePort("53-udp", Port(53), "UDP", Port(53))
+              ))
+          )
         )
       )
 

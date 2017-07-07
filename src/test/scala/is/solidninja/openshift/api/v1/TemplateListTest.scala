@@ -7,6 +7,8 @@ import org.scalatest.{FreeSpec, Matchers}
 
 import io.circe.literal._
 
+import is.solidninja.k8s.api.v1._
+
 import JsonProtocol._
 
 class TemplateListTest extends FreeSpec with Matchers {
@@ -17,10 +19,37 @@ class TemplateListTest extends FreeSpec with Matchers {
         "kind": "List",
         "apiVersion": "v1",
         "metadata": {},
-        "items": []
+        "items": [
+          {
+            "kind" : "Service",
+            "apiVersion" : "v1",
+            "metadata" : {
+              "name" : "dnsmasq"
+            },
+            "spec" : {
+              "type" : "ClusterIP"
+            }
+          }
+        ]
       }"""
 
-      j.as[TemplateList] should equal(Right(TemplateList(items = Nil)))
+      val service = Service(
+        metadata = Some(
+          ObjectMeta(
+            name = Some("dnsmasq")
+          )),
+        spec = ServiceSpec(
+          `type` = "ClusterIP"
+        )
+      )
+      val expected = TemplateList(
+        items = Right(service) :: Nil,
+        metadata = Some(ObjectMeta())
+      )
+
+      j.as[TemplateList] should equal(Right(expected))
+
+//      j.as[TemplateList].toTry.get.asJson should equal(j)
       // FIXME - test for encoding back to json
     }
   }

@@ -6,6 +6,8 @@ package v1
 import java.time.{ZoneId, ZonedDateTime}
 import java.time.format.DateTimeFormatter
 
+import cats.syntax.functor._
+
 import io.circe._
 import io.circe.generic.semiauto._
 
@@ -32,6 +34,20 @@ private[v1] trait ValueDecoderInstances {
   implicit val decodeImageName: Decoder[ImageName] =
     Decoder.decodeString.map(ImageName)
 
+  implicit val decodeIPAddress: Decoder[IPAddress] = Decoder.decodeString.map(IPAddress)
+
+  implicit val decodePort: Decoder[Port] = Decoder.decodeInt.map(Port)
+
+  implicit val decodeName: Decoder[Name] = Decoder.decodeString.map(Name)
+
+  implicit val decodePortOrName: Decoder[PortOrName] = List[Decoder[PortOrName]](
+    Decoder[Port].widen,
+    Decoder[Name].widen
+  ).reduceLeft(_ or _)
+
+  implicit val decodeSelector: Decoder[Selector] =
+    Decoder.decodeMapLike[Map, String, Json].map(Selector.apply)
+
   private def toTimestamp(s: String): Try[Timestamp] =
     Try(ZonedDateTime.from(DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).parse(s)))
       .map(Timestamp)
@@ -57,6 +73,8 @@ trait DecoderInstances extends ValueDecoderInstances {
       name <- c.get[String]("name")
       value <- c.getOrElse[String]("value")("")
     } yield EnvVar(name, value))
+
+  implicit val decodeServicePort: Decoder[ServicePort] = deriveDecoder
 
   implicit val decodeServiceSpec: Decoder[ServiceSpec] = deriveDecoder
 

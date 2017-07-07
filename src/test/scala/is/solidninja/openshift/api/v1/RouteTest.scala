@@ -56,14 +56,13 @@ class RouteTest extends FreeSpec with Matchers {
           }
       }"""
 
-
       val expected = Route(
-        metadata = Some(ObjectMeta.empty.copy(
-          name = Some("dnsmasq"),
-          annotations = Some(Annotations(Map(
-            "openshift.io/host.generated" -> Json.fromString("true")
-          ))
-        ))),
+        metadata = Some(
+          ObjectMeta(name = Some("dnsmasq"),
+                     annotations = Some(
+                       Annotations(Map(
+                         "openshift.io/host.generated" -> Json.fromString("true")
+                       ))))),
         spec = RouteSpec(
           host = "dnsmasq-myproject.192.168.42.131.nip.io",
           to = RouteTargetReference(

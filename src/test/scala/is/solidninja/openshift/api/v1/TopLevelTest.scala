@@ -83,7 +83,7 @@ class TopLevelTest extends FreeSpec with Matchers {
 
       val expected: List[TopLevel] = List(
         Route(
-          metadata = Some(ObjectMeta.empty),
+          metadata = Some(ObjectMeta()),
           spec = RouteSpec(
             host = "dnsmasq-myproject.192.168.42.131.nip.io",
             to = RouteTargetReference(
@@ -93,7 +93,7 @@ class TopLevelTest extends FreeSpec with Matchers {
           )
         ),
         DeploymentConfig(
-          metadata = Some(ObjectMeta.empty),
+          metadata = Some(ObjectMeta()),
           spec = DeploymentConfigSpec(
             strategy = DeploymentStrategy("Rolling"),
             triggers = Nil,
@@ -101,7 +101,7 @@ class TopLevelTest extends FreeSpec with Matchers {
             test = false,
             template = Some(
               PodTemplateSpec(
-                metadata = Some(ObjectMeta.empty),
+                metadata = Some(ObjectMeta()),
                 spec = PodSpec(
                   volumes = None,
                   containers = List(Container(
@@ -191,7 +191,16 @@ class TopLevelTest extends FreeSpec with Matchers {
         Right(
           Service(
             metadata = None,
-            spec = ServiceSpec()
+            spec = ServiceSpec(
+              `type` = "ClusterIP",
+              sessionAffinity = Some("None"),
+              selector = Some(Selector(Map("deploymentconfig" -> Json.fromString("dnsmasq")))),
+              ports = Some(
+                List(
+                  ServicePort("53-tcp", Port(53), "TCP", Port(53)),
+                  ServicePort("53-udp", Port(53), "UDP", Port(53))
+                ))
+            )
           ))
       )
 

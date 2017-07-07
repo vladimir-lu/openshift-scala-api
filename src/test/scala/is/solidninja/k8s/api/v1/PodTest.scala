@@ -94,7 +94,7 @@ class PodTest extends FreeSpec with Matchers {
       // FIXME - how to get rid of copy-pasted material?
 
       val meta = ObjectMeta(
-        name = "mongodb-1-deploy",
+        objectName = "mongodb-1-deploy",
         namespace = Namespace("myproject"),
         labels = Map.empty,
         annotations = Annotations(Map.empty)

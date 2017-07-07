@@ -8,9 +8,11 @@ import io.circe.generic.semiauto._
 import io.circe.syntax._
 
 trait EncoderInstances extends is.solidninja.k8s.api.v1.EncoderInstances {
-  implicit val encodeDeploymentConfig: Encoder[DeploymentConfig] = deriveEncoder
+  implicit val encodeDeploymentConfig: Encoder[DeploymentConfig] =
+    deriveEncoder[DeploymentConfig].mapJsonObject(v1Object("DeploymentConfig"))
 
-  implicit val encodeDeploymentConfigList: Encoder[DeploymentConfigList] = deriveEncoder
+  implicit val encodeDeploymentConfigList: Encoder[DeploymentConfigList] =
+    deriveEncoder[DeploymentConfigList].mapJsonObject(v1Object("DeploymentConfigList"))
 
   implicit val encodeDeploymentConfigSpec: Encoder[DeploymentConfigSpec] = deriveEncoder
 
@@ -26,7 +28,7 @@ trait EncoderInstances extends is.solidninja.k8s.api.v1.EncoderInstances {
 
   implicit val encodeRouteSpec: Encoder[RouteSpec] = deriveEncoder
 
-  implicit val encodeRoute: Encoder[Route] = deriveEncoder
+  implicit val encodeRoute: Encoder[Route] = deriveEncoder[Route].mapJsonObject(v1Object("Route"))
 
   implicit val encodeRouteList: Encoder[RouteList] = deriveEncoder
 
@@ -37,5 +39,5 @@ trait EncoderInstances extends is.solidninja.k8s.api.v1.EncoderInstances {
     case Right(k8stopLevel) => k8stopLevel.asJson
   }
 
-  implicit val encodeTemplateList: Encoder[TemplateList] = deriveEncoder
+  implicit val encodeTemplateList: Encoder[TemplateList] = deriveEncoder[TemplateList].mapJsonObject(v1Object("List"))
 }

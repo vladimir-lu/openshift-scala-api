@@ -9,6 +9,14 @@ import io.circe.Json
 
 // FIXME: Incomplete mappings
 
+case class IPAddress(v: String) extends AnyVal
+
+sealed trait PortOrName
+case class Port(port: Int) extends PortOrName
+case class Name(name: String) extends PortOrName
+
+case class Selector(v: Map[String, Json]) extends AnyVal
+
 case class Timestamp(v: ZonedDateTime) extends AnyVal
 case class Namespace(v: String) extends AnyVal
 case class Annotations(v: Map[String, Json]) extends AnyVal
@@ -67,9 +75,9 @@ case class PodSpec(volumes: Option[List[Volume]], containers: List[Container])
   */
 case class Container(image: ImageName,
                      imagePullPolicy: String,
-                     args: Option[List[String]],
-                     command: Option[List[String]],
-                     env: Option[List[EnvVar]])
+                     args: Option[List[String]] = None,
+                     command: Option[List[String]] = None,
+                     env: Option[List[EnvVar]] = None)
 
 // FIXME: ImagePullPolicy not a string
 
@@ -86,18 +94,21 @@ case class EnvVar(name: String, value: String)
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#objectmeta-v1 ObjectMeta v1]]
   */
-case class ObjectMeta(name: Option[String],
-                      namespace: Option[Namespace],
-                      labels: Option[Map[String, String]],
-                      annotations: Option[Annotations],
-                      uid: Option[Uid],
-                      resourceVersion: Option[Version],
-                      creationTimestamp: Option[Timestamp],
-                      selfLink: Option[Path])
+case class ObjectMeta(name: Option[String] = None,
+                      namespace: Option[Namespace] = None,
+                      labels: Option[Map[String, String]] = None,
+                      annotations: Option[Annotations] = None,
+                      uid: Option[Uid] = None,
+                      resourceVersion: Option[Version] = None,
+                      creationTimestamp: Option[Timestamp] = None,
+                      selfLink: Option[Path] = None)
 
 object ObjectMeta {
-  def apply(name: String, namespace: Namespace, labels: Map[String, String], annotations: Annotations): ObjectMeta =
-    ObjectMeta(Some(name),
+  def apply(objectName: String,
+            namespace: Namespace,
+            labels: Map[String, String],
+            annotations: Annotations): ObjectMeta =
+    ObjectMeta(Some(objectName),
                Some(namespace),
                Some(labels),
                Some(annotations),
@@ -105,17 +116,6 @@ object ObjectMeta {
                resourceVersion = None,
                creationTimestamp = None,
                selfLink = None)
-
-  val empty = ObjectMeta(
-    name = None,
-    namespace = None,
-    labels = None,
-    annotations = None,
-    uid = None,
-    resourceVersion = None,
-    creationTimestamp = None,
-    selfLink = None
-  )
 }
 
 /**
@@ -135,4 +135,20 @@ case class ServiceList(metadata: Option[ObjectMeta], items: List[Service]) exten
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#servicespec-v1 ServiceSpec v1]]
   */
-case class ServiceSpec()
+case class ServiceSpec(`type`: String,
+                       clusterIP: Option[IPAddress] = None,
+                       externalIPs: Option[IPAddress] = None,
+                       externalName: Option[String] = None,
+                       loadBalancerIP: Option[IPAddress] = None,
+                       ports: Option[List[ServicePort]] = None,
+                       selector: Option[Selector] = None,
+                       sessionAffinity: Option[String] = None)
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#serviceport-v1 ServicePort v1]]
+  */
+case class ServicePort(name: String,
+                       port: Port,
+                       protocol: String,
+                       targetPort: PortOrName,
+                       nodePort: Option[Int] = None)
