@@ -2,9 +2,11 @@ package is.solidninja
 package openshift
 package api
 
+import cats.syntax.EitherSyntax
+
 import scala.language.implicitConversions
 
-package object v1 {
+package object v1 extends EitherSyntax {
   type HasMetadata = is.solidninja.k8s.api.v1.HasMetadata
 
   type Pod = is.solidninja.k8s.api.v1.Pod

@@ -8,8 +8,6 @@ import is.solidninja.k8s.api.v1.{TopLevel => K8sTopLevel}
 import io.circe._
 import io.circe.generic.semiauto._
 
-import cats.syntax.either._
-
 trait DecoderInstances extends is.solidninja.k8s.api.v1.DecoderInstances {
 
   implicit val decodeDeploymentConfig: Decoder[DeploymentConfig] = deriveDecoder
