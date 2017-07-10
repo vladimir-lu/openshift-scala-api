@@ -118,7 +118,7 @@ case class RouteSpec(host: String, to: RouteTargetReference, port: Option[RouteP
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-routetargetreference RouteTargetReference v1]]
   */
-case class RouteTargetReference(kind: String, name: String, weight: Int)
+case class RouteTargetReference(kind: String, name: String, weight: Option[Int] = None)
 
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-routeport v1 RoutePort]]

@@ -55,7 +55,8 @@ class PodSpecTest extends FreeSpec with Matchers {
         restartPolicy = Some("Never"),
         terminationGracePeriodSeconds = Some(10),
         dnsPolicy = Some("ClusterFirst"),
-        securityContext = Some(PodSecurityContext())
+        securityContext = Some(PodSecurityContext()),
+        imagePullSecrets = Some(Nil)
       )
 
       j.as[PodSpec] should equal(Right(expected))

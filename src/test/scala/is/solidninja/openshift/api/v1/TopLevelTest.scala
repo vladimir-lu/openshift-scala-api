@@ -89,7 +89,7 @@ class TopLevelTest extends FreeSpec with Matchers {
             to = RouteTargetReference(
               kind = "Service",
               name = "dnsmasq",
-              weight = 100
+              weight = Some(100)
             ),
             port = Some(RoutePort("53-tcp")),
             wildcardPolicy = Some("None")
@@ -211,7 +211,7 @@ class TopLevelTest extends FreeSpec with Matchers {
               to = RouteTargetReference(
                 kind = "Service",
                 name = "dnsmasq",
-                weight = 100
+                weight = Some(100)
               ),
               port = Some(RoutePort("53-tcp")),
               wildcardPolicy = Some("None")

@@ -57,6 +57,14 @@ trait EncoderInstances extends ValueEncoderInstances {
 
   implicit val encodePodList: Encoder[PodList] = deriveEncoder[PodList].mapJsonObject(v1Object("PodList"))
 
+  implicit val encodePersistentVolumeClaimSource: Encoder[PersistentVolumeClaimSource] = deriveEncoder
+
+  implicit val encodeSecretVolumeSource: Encoder[SecretVolumeSource] = deriveEncoder
+
+  implicit val encodeVolumeMount: Encoder[VolumeMount] = deriveEncoder
+
+  implicit val encodeLocalObjectReference: Encoder[LocalObjectReference] = deriveEncoder
+
   implicit val encodePodSpec: Encoder[PodSpec] = deriveEncoder
 
   implicit val encodeVolume: Encoder[Volume] = deriveEncoder

@@ -73,7 +73,13 @@ case class PodSpec(volumes: Option[List[Volume]],
                    restartPolicy: Option[String] = None,
                    terminationGracePeriodSeconds: Option[Int] = None,
                    dnsPolicy: Option[String] = None,
-                   securityContext: Option[PodSecurityContext] = None)
+                   securityContext: Option[PodSecurityContext] = None,
+                   imagePullSecrets: Option[List[LocalObjectReference]] = None)
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#localobjectreference-v1 LocalObjectReference v1]]
+  */
+case class LocalObjectReference(name: String)
 
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#container-v1 Container v1]]
@@ -86,9 +92,18 @@ case class Container(image: ImageName,
                      command: Option[List[String]] = None,
                      env: Option[List[EnvVar]] = None,
                      resources: Option[ResourceRequirements] = None,
-                     terminationMessagePath: Option[String] = None)
+                     terminationMessagePath: Option[String] = None,
+                     volumeMounts: Option[List[VolumeMount]] = None)
 
 // FIXME: ImagePullPolicy not a string
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#volumemount-v1 v1 VolumeMount]]
+  */
+case class VolumeMount(mountPath: String,
+                       name: String,
+                       readOnly: Option[Boolean] = None,
+                       subPath: Option[String] = None)
 
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#podsecuritycontext-v1 v1 PodSecurityContext]]
@@ -111,7 +126,19 @@ case class ResourceRequirements( /* FIXME */ )
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#volume-v1 Volume v1]]
   */
-case class Volume(name: String)
+case class Volume(name: String,
+                  persistentVolumeClaim: Option[PersistentVolumeClaimSource] = None,
+                  secret: Option[SecretVolumeSource] = None)
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#secretvolumesource-v1 SecretVolumeSource v1]]
+  */
+case class SecretVolumeSource(secretName: String)
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#persistentvolumeclaimvolumesource-v1 PersistentVolumeClaimSource v1]]
+  */
+case class PersistentVolumeClaimSource(claimName: String)
 
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#envvar-v1 EnvVar]]

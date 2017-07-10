@@ -23,7 +23,11 @@ class VolumeTest extends FreeSpec with Matchers {
           }"""
 
       val expected = Volume(
-        name = "deployer-token-rtf4m"
+        name = "deployer-token-rtf4m",
+        secret = Some(
+          SecretVolumeSource(
+            secretName = "deployer-token-rtf4m"
+          ))
       )
 
       j.as[Volume] should equal(Right(expected))

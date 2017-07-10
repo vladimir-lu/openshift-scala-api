@@ -92,16 +92,19 @@ object TestApp extends App {
     cluster <- OpenshiftCluster(url, token, client)
     project <- cluster.project(ProjectId("myproject"))
     dc <- project.deploymentConfig("dnsmasq")
-    patched <- project.createRoute(Route(
-      metadata = Some(ObjectMeta(
-        name = Some("dnsmasq2")
-      )),
-      RouteSpec(
-        host = "dnsmasq2",
-        to = RouteTargetReference(kind = "Service", name = "dnsmasq", weight = 100),
-        port = None,
-        wildcardPolicy = None
-    )))
+    patched <- project.createRoute(
+      Route(
+        metadata = Some(
+          ObjectMeta(
+            name = Some("dnsmasq2")
+          )),
+        RouteSpec(
+          host = "dnsmasq2",
+          to = RouteTargetReference(kind = "Service", name = "dnsmasq", weight = Some(100)),
+          port = None,
+          wildcardPolicy = None
+        )
+      ))
   } yield (dc, patched)
 
   println(res.unsafeRun())

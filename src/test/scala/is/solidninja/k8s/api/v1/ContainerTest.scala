@@ -67,7 +67,13 @@ class ContainerTest extends FreeSpec with Matchers {
         image = ImageName("openshift/origin-deployer:v1.5.1"),
         imagePullPolicy = "IfNotPresent",
         resources = Some(ResourceRequirements()),
-        terminationMessagePath = Some("/dev/termination-log")
+        terminationMessagePath = Some("/dev/termination-log"),
+        volumeMounts = Some(
+          List(
+            VolumeMount(mountPath = "/var/run/secrets/kubernetes.io/serviceaccount",
+                        name = "deployer-token-rtf4m",
+                        readOnly = Some(true))
+          ))
       )
 
       j.as[Container] should equal(Right(expected))
@@ -105,7 +111,8 @@ class ContainerTest extends FreeSpec with Matchers {
           }
         ],
         "resources" : null,
-        "terminationMessagePath" : null
+        "terminationMessagePath" : null,
+        "volumeMounts" : null
       }""")
       container.asJson.as[Container] should equal(Right(container))
     }

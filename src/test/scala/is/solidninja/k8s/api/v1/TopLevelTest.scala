@@ -82,7 +82,8 @@ class TopLevelTest extends FreeSpec with Matchers {
                 env = Some(Nil),
                 name = Some("deployment"),
                 resources = Some(ResourceRequirements()),
-                terminationMessagePath = Some("/dev/termination-log")
+                terminationMessagePath = Some("/dev/termination-log"),
+                volumeMounts = Some(Nil)
               )
             )
           )
