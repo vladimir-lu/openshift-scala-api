@@ -48,8 +48,14 @@ class PodSpecTest extends FreeSpec with Matchers {
           command = None,
           env = None,
           image = ImageName("openshift/origin-deployer:v1.5.1"),
-          imagePullPolicy = "IfNotPresent"
-        ) :: Nil
+          imagePullPolicy = "IfNotPresent",
+          name = Some("deployment"),
+          resources = Some(ResourceRequirements())
+        ) :: Nil,
+        restartPolicy = Some("Never"),
+        terminationGracePeriodSeconds = Some(10),
+        dnsPolicy = Some("ClusterFirst"),
+        securityContext = Some(PodSecurityContext())
       )
 
       j.as[PodSpec] should equal(Right(expected))

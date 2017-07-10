@@ -90,7 +90,8 @@ class ServiceTest extends FreeSpec with Matchers {
       )
 
       j.as[Service] should equal(Right(expected))
-//      j.as[Service].toTry.get.asJson should equal (j)
+
+      // FIXME test for encoding back to json
     }
 
     "should encode a simple service" in {

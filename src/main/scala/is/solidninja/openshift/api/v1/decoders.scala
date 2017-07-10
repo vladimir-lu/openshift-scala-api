@@ -10,6 +10,8 @@ import io.circe.generic.semiauto._
 
 trait DecoderInstances extends is.solidninja.k8s.api.v1.DecoderInstances {
 
+  implicit val decodeObjectReference: Decoder[ObjectReference] = deriveDecoder
+
   implicit val decodeDeploymentConfig: Decoder[DeploymentConfig] = deriveDecoder
 
   implicit val decodeDeploymentConfigList: Decoder[DeploymentConfigList] = deriveDecoder
@@ -18,13 +20,19 @@ trait DecoderInstances extends is.solidninja.k8s.api.v1.DecoderInstances {
 
   implicit val decodeDeploymentConfigStatus: Decoder[DeploymentConfigStatus] = deriveDecoder
 
+  implicit val decodeRollingDeploymentStrategyParams: Decoder[RollingDeploymentStrategyParams] = deriveDecoder
+
   implicit val decodeDeploymentStrategy: Decoder[DeploymentStrategy] = deriveDecoder
+
+  implicit val decodeDeploymentTriggerImageChangeParams: Decoder[DeploymentTriggerImageChangeParams] = deriveDecoder
 
   implicit val decodeDeploymentTriggerPolicy: Decoder[DeploymentTriggerPolicy] = deriveDecoder
 
   implicit val decodePodTemplateSpec: Decoder[PodTemplateSpec] = deriveDecoder
 
   implicit val decodeRouteTargetReference: Decoder[RouteTargetReference] = deriveDecoder
+
+  implicit val decodeRoutePort: Decoder[RoutePort] = deriveDecoder
 
   implicit val decodeRouteSpec: Decoder[RouteSpec] = deriveDecoder
 

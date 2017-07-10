@@ -67,8 +67,11 @@ class RouteTest extends FreeSpec with Matchers {
           host = "dnsmasq-myproject.192.168.42.131.nip.io",
           to = RouteTargetReference(
             kind = "Service",
-            name = "dnsmasq"
-          )
+            name = "dnsmasq",
+            weight = 100
+          ),
+          port = Some(RoutePort("53-tcp")),
+          wildcardPolicy = Some("None")
         )
       )
 

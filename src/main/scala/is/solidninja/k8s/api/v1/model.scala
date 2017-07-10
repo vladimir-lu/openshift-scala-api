@@ -68,18 +68,45 @@ case class PodList(metadata: Option[ObjectMeta], items: List[Pod]) extends V1Obj
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#podspec-v1 PodSpec v1]]
   */
-case class PodSpec(volumes: Option[List[Volume]], containers: List[Container])
+case class PodSpec(volumes: Option[List[Volume]],
+                   containers: List[Container],
+                   restartPolicy: Option[String] = None,
+                   terminationGracePeriodSeconds: Option[Int] = None,
+                   dnsPolicy: Option[String] = None,
+                   securityContext: Option[PodSecurityContext] = None)
 
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#container-v1 Container v1]]
   */
 case class Container(image: ImageName,
                      imagePullPolicy: String,
+                     name: Option[String] = None,
+                     ports: Option[List[ContainerPort]] = None,
                      args: Option[List[String]] = None,
                      command: Option[List[String]] = None,
-                     env: Option[List[EnvVar]] = None)
+                     env: Option[List[EnvVar]] = None,
+                     resources: Option[ResourceRequirements] = None,
+                     terminationMessagePath: Option[String] = None)
 
 // FIXME: ImagePullPolicy not a string
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#podsecuritycontext-v1 v1 PodSecurityContext]]
+  */
+case class PodSecurityContext()
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#containerport-v1 v1 ContainerPort]]
+  */
+case class ContainerPort(containerPort: Int,
+                         protocol: Option[String] = None,
+                         hostIP: Option[IPAddress] = None,
+                         hostPort: Option[Port] = None)
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#resourcerequirements-v1 v1 ResourceRequirements]]
+  */
+case class ResourceRequirements( /* FIXME */ )
 
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#volume-v1 Volume v1]]

@@ -108,9 +108,15 @@ class PodTest extends FreeSpec with Matchers {
             imagePullPolicy = "IfNotPresent",
             args = None,
             command = None,
-            env = Some(Nil)
+            env = Some(Nil),
+            name = Some("deployment"),
+            resources = Some(ResourceRequirements()),
+            terminationMessagePath = Some("/dev/termination-log")
           )
-        )
+        ),
+        restartPolicy = Some("Never"),
+        terminationGracePeriodSeconds = Some(10),
+        dnsPolicy = Some("ClusterFirst")
       )
 
       val expected = Pod(

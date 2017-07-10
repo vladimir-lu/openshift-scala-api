@@ -66,7 +66,13 @@ trait DecoderInstances extends ValueDecoderInstances {
 
   implicit val decodeVolume: Decoder[Volume] = deriveDecoder
 
+  implicit val decodeContainerPort: Decoder[ContainerPort] = deriveDecoder
+
+  implicit val decodePodSecurityContext: Decoder[PodSecurityContext] = deriveDecoder
+
   implicit val decodeContainer: Decoder[Container] = deriveDecoder
+
+  implicit val decodeResourceRequirements: Decoder[ResourceRequirements] = deriveDecoder
 
   implicit val decodeEnvVar: Decoder[EnvVar] = Decoder.instance(c =>
     for {

@@ -79,8 +79,12 @@ class TopLevelTest extends FreeSpec with Matchers {
                 imagePullPolicy = "IfNotPresent",
                 args = None,
                 command = None,
-                env = Some(Nil)
-              ))
+                env = Some(Nil),
+                name = Some("deployment"),
+                resources = Some(ResourceRequirements()),
+                terminationMessagePath = Some("/dev/termination-log")
+              )
+            )
           )
         ),
         Service(

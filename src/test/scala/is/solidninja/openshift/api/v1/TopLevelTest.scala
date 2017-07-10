@@ -88,14 +88,31 @@ class TopLevelTest extends FreeSpec with Matchers {
             host = "dnsmasq-myproject.192.168.42.131.nip.io",
             to = RouteTargetReference(
               kind = "Service",
-              name = "dnsmasq"
-            )
+              name = "dnsmasq",
+              weight = 100
+            ),
+            port = Some(RoutePort("53-tcp")),
+            wildcardPolicy = Some("None")
           )
         ),
         DeploymentConfig(
           metadata = Some(ObjectMeta()),
           spec = DeploymentConfigSpec(
-            strategy = DeploymentStrategy("Rolling"),
+            strategy = DeploymentStrategy(
+              `type` = "Rolling",
+              rollingParams = Some(
+                RollingDeploymentStrategyParams(
+                  updatePeriodSeconds = Some(1),
+                  intervalSeconds = Some(1),
+                  timeoutSeconds = Some(600),
+                  maxUnavailable = Some("25%"),
+                  maxSurge = Some("25%")
+                )),
+              labels = None,
+              annotations = None,
+              resources = Some(ResourceRequirements()),
+              activeDeadlineSeconds = Some(21600)
+            ),
             triggers = Nil,
             replicas = 1,
             test = false,
@@ -110,10 +127,19 @@ class TopLevelTest extends FreeSpec with Matchers {
                     imagePullPolicy = "Always",
                     args = None,
                     command = None,
-                    env = None
-                  ))
+                    env = None,
+                    name = Some("dnsmasq"),
+                    ports = Some(Nil),
+                    resources = Some(ResourceRequirements()),
+                    terminationMessagePath = Some("/dev/termination-log")
+                  )),
+                  restartPolicy = Some("Always"),
+                  terminationGracePeriodSeconds = Some(30),
+                  dnsPolicy = Some("ClusterFirst"),
+                  securityContext = Some(PodSecurityContext())
                 )
-              ))
+              )),
+            selector = Some(Selector(Map.empty))
           ),
           status = None
         )
@@ -184,8 +210,11 @@ class TopLevelTest extends FreeSpec with Matchers {
               host = "dnsmasq-myproject.192.168.42.131.nip.io",
               to = RouteTargetReference(
                 kind = "Service",
-                name = "dnsmasq"
-              )
+                name = "dnsmasq",
+                weight = 100
+              ),
+              port = Some(RoutePort("53-tcp")),
+              wildcardPolicy = Some("None")
             )
           )),
         Right(

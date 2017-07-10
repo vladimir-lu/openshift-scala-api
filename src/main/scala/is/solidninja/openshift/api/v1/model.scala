@@ -3,7 +3,7 @@ package openshift
 package api
 package v1
 
-import is.solidninja.k8s.api.v1.{ObjectMeta, PodSpec}
+import is.solidninja.k8s.api.v1.{Annotations, ImageName, ObjectMeta, PodSpec, ResourceRequirements, Selector}
 
 sealed trait TopLevel extends HasMetadata {
   def kind: String
@@ -12,6 +12,17 @@ sealed trait TopLevel extends HasMetadata {
 sealed trait V1Object extends TopLevel {
   val apiVersion = "v1"
 }
+
+/**
+  * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-objectreference v1 ObjectReference]]
+  */
+case class ObjectReference(kind: Option[String],
+                           namespace: Option[String],
+                           name: Option[String],
+                           uid: Option[String],
+                           apiVersion: Option[String],
+                           resourceVersion: Option[String],
+                           fieldPath: Option[String])
 
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-deploymentconfiglist v1 DeploymentConfigList]]
@@ -37,7 +48,8 @@ case class DeploymentConfigSpec(strategy: DeploymentStrategy,
                                 triggers: List[DeploymentTriggerPolicy],
                                 replicas: Int,
                                 test: Boolean,
-                                template: Option[PodTemplateSpec])
+                                template: Option[PodTemplateSpec],
+                                selector: Option[Selector])
 
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-deploymentconfigstatus v1 DeploymentConfigStatus]]
@@ -47,12 +59,37 @@ case class DeploymentConfigStatus(latestVersion: Option[Int], observedGeneration
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-deploymentstrategy v1 DeploymentStrategy]]
   */
-case class DeploymentStrategy(`type`: String)
+case class DeploymentStrategy(`type`: String,
+                              rollingParams: Option[RollingDeploymentStrategyParams],
+                              resources: Option[ResourceRequirements],
+                              labels: Option[Map[String, String]],
+                              annotations: Option[Annotations],
+                              activeDeadlineSeconds: Option[Int])
+
+// FIXME - customParams
+// FIXME - recreateParams
+
+/**
+  * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-rollingdeploymentstrategyparams v1 RollingDeploymentStrategyParams]]
+  */
+case class RollingDeploymentStrategyParams(updatePeriodSeconds: Option[Int],
+                                           intervalSeconds: Option[Int],
+                                           timeoutSeconds: Option[Int],
+                                           maxUnavailable: Option[String],
+                                           maxSurge: Option[String])
 
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-deploymenttriggerpolicy v1 DeploymentTriggerPolicy]]
   */
-case class DeploymentTriggerPolicy(`type`: String)
+case class DeploymentTriggerPolicy(`type`: String, imageChangeParams: Option[DeploymentTriggerImageChangeParams])
+
+/**
+  * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-deploymenttriggerimagechangeparams v1 DeploymentTriggerImageChangeParams]]
+  */
+case class DeploymentTriggerImageChangeParams(automatic: Option[Boolean],
+                                              containerNames: List[String],
+                                              from: ObjectReference,
+                                              lastTriggeredImage: ImageName)
 
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-podtemplatespec v1 PodTemplateSpec]]
@@ -76,12 +113,17 @@ case class RouteList(metadata: Option[ObjectMeta], items: List[Route]) extends V
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-routespec RouteSpec v1 ]]
   */
-case class RouteSpec(host: String, to: RouteTargetReference)
+case class RouteSpec(host: String, to: RouteTargetReference, port: Option[RoutePort], wildcardPolicy: Option[String])
 
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-routetargetreference RouteTargetReference v1]]
   */
-case class RouteTargetReference(kind: String, name: String)
+case class RouteTargetReference(kind: String, name: String, weight: Int)
+
+/**
+  * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-routeport v1 RoutePort]]
+  */
+case class RoutePort(targetPort: String)
 
 /**
   * List of items (kind: List) - comes from expansion of templates

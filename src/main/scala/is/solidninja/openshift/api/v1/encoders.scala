@@ -8,6 +8,9 @@ import io.circe.generic.semiauto._
 import io.circe.syntax._
 
 trait EncoderInstances extends is.solidninja.k8s.api.v1.EncoderInstances {
+
+  implicit val encodeObjectRefenrece: Encoder[ObjectReference] = deriveEncoder
+
   implicit val encodeDeploymentConfig: Encoder[DeploymentConfig] =
     deriveEncoder[DeploymentConfig].mapJsonObject(v1Object("DeploymentConfig"))
 
@@ -18,13 +21,19 @@ trait EncoderInstances extends is.solidninja.k8s.api.v1.EncoderInstances {
 
   implicit val encodeDeploymentConfigStatus: Encoder[DeploymentConfigStatus] = deriveEncoder
 
+  implicit val encodeRollingDeploymentStrategyParams: Encoder[RollingDeploymentStrategyParams] = deriveEncoder
+
   implicit val encodeDeploymentStrategy: Encoder[DeploymentStrategy] = deriveEncoder
+
+  implicit val encodeDeploymentTriggerImageChangeParams: Encoder[DeploymentTriggerImageChangeParams] = deriveEncoder
 
   implicit val encodeDeploymentTriggerPolicy: Encoder[DeploymentTriggerPolicy] = deriveEncoder
 
   implicit val encodePodTemplateSpec: Encoder[PodTemplateSpec] = deriveEncoder
 
   implicit val encodeRouteTargetReference: Encoder[RouteTargetReference] = deriveEncoder
+
+  implicit val encodeRoutePort: Encoder[RoutePort] = deriveEncoder
 
   implicit val encodeRouteSpec: Encoder[RouteSpec] = deriveEncoder
 

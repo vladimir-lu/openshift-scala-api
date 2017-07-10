@@ -61,6 +61,12 @@ trait EncoderInstances extends ValueEncoderInstances {
 
   implicit val encodeVolume: Encoder[Volume] = deriveEncoder
 
+  implicit val encodeContainerPort: Encoder[ContainerPort] = deriveEncoder
+
+  implicit val encodeResourceRequirements: Encoder[ResourceRequirements] = deriveEncoder
+
+  implicit val encodePodSecurityContext: Encoder[PodSecurityContext] = deriveEncoder
+
   implicit val encodeContainer: Encoder[Container] = deriveEncoder
 
   implicit val encodeEnvVar: Encoder[EnvVar] = deriveEncoder

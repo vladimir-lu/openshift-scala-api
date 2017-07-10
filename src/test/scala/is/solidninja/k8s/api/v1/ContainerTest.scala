@@ -58,13 +58,16 @@ class ContainerTest extends FreeSpec with Matchers {
       val expected = Container(
         args = None,
         command = None,
+        name = Some("deployment"),
         env = Some(
           List(
             EnvVar("KUBERNETES_MASTER", "https://172.22.22.60:8443"),
             EnvVar("OPENSHIFT_DEPLOYMENT_NAMESPACE", "myproject")
           )),
         image = ImageName("openshift/origin-deployer:v1.5.1"),
-        imagePullPolicy = "IfNotPresent"
+        imagePullPolicy = "IfNotPresent",
+        resources = Some(ResourceRequirements()),
+        terminationMessagePath = Some("/dev/termination-log")
       )
 
       j.as[Container] should equal(Right(expected))
@@ -87,6 +90,8 @@ class ContainerTest extends FreeSpec with Matchers {
       container.asJson should equal(json"""{
         "image" : "openshift/origin-deployer:v1.5.1",
         "imagePullPolicy" : "IfNotPresent",
+        "name" : null,
+        "ports" : null,
         "args" : null,
         "command" : null,
         "env" : [
@@ -98,7 +103,9 @@ class ContainerTest extends FreeSpec with Matchers {
             "name" : "OPENSHIFT_DEPLOYMENT_NAMESPACE",
             "value" : "myproject"
           }
-        ]
+        ],
+        "resources" : null,
+        "terminationMessagePath" : null
       }""")
       container.asJson.as[Container] should equal(Right(container))
     }

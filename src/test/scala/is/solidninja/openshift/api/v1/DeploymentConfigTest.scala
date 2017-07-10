@@ -19,6 +19,8 @@ class DeploymentConfigTest extends FreeSpec with Matchers {
   "DeploymentConfig v1" - {
     "should decode based on a simple example" in {
       val j: Json = json"""{
+      "kind": "DeploymentConfig",
+      "apiVersion": "v1",
       "metadata": {
         "name": "dnsmasq",
         "namespace": "myproject",
@@ -155,10 +157,41 @@ class DeploymentConfigTest extends FreeSpec with Matchers {
 
       val expected = DeploymentConfig(
         spec = DeploymentConfigSpec(
-          strategy = DeploymentStrategy(`type` = "Rolling"),
+          strategy = DeploymentStrategy(
+            `type` = "Rolling",
+            rollingParams = Some(
+              RollingDeploymentStrategyParams(
+                updatePeriodSeconds = Some(1),
+                intervalSeconds = Some(1),
+                timeoutSeconds = Some(600),
+                maxUnavailable = Some("25%"),
+                maxSurge = Some("25%")
+              )),
+            labels = None,
+            annotations = None,
+            resources = Some(ResourceRequirements()),
+            activeDeadlineSeconds = Some(21600)
+          ),
           triggers = List(
-            DeploymentTriggerPolicy(`type` = "ConfigChange"),
-            DeploymentTriggerPolicy(`type` = "ImageChange")
+            DeploymentTriggerPolicy(`type` = "ConfigChange", imageChangeParams = None),
+            DeploymentTriggerPolicy(
+              `type` = "ImageChange",
+              imageChangeParams = Some(DeploymentTriggerImageChangeParams(
+                automatic = Some(true),
+                containerNames = List("dnsmasq"),
+                from = ObjectReference(
+                  kind = Some("ImageStreamTag"),
+                  namespace = Some("myproject"),
+                  name = Some("dnsmasq:latest"),
+                  uid = None,
+                  apiVersion = None,
+                  resourceVersion = None,
+                  fieldPath = None
+                ),
+                lastTriggeredImage = ImageName(
+                  "andyshinn/dnsmasq@sha256:e219b6a321579580aad06782f048dddb907ea990f86231ca0517a406853dc2eb")
+              ))
+            )
           ),
           replicas = 1,
           test = false,
@@ -188,11 +221,25 @@ class DeploymentConfigTest extends FreeSpec with Matchers {
                     imagePullPolicy = "Always",
                     args = None,
                     command = None,
-                    env = None
+                    env = None,
+                    name = Some("dnsmasq"),
+                    ports = Some(
+                      List(
+                        ContainerPort(containerPort = 53, protocol = Some("TCP")),
+                        ContainerPort(containerPort = 53, protocol = Some("UDP"))
+                      )),
+                    resources = Some(ResourceRequirements()),
+                    terminationMessagePath = Some("/dev/termination-log")
                   )
-                )
+                ),
+                restartPolicy = Some("Always"),
+                terminationGracePeriodSeconds = Some(30),
+                securityContext = Some(PodSecurityContext()),
+                dnsPolicy = Some("ClusterFirst")
               )
-            ))
+            )),
+          selector =
+            Some(Selector(Map("app" -> Json.fromString("dnsmasq"), "deploymentconfig" -> Json.fromString("dnsmasq"))))
         ),
         status =
           Some(DeploymentConfigStatus(latestVersion = Some(1), observedGeneration = Some(2), replicas = Some(0))),
@@ -212,7 +259,6 @@ class DeploymentConfigTest extends FreeSpec with Matchers {
       )
 
       j.as[DeploymentConfig] should equal(Right(expected))
-      // FIXME - add test for encoding back to json
     }
   }
 
