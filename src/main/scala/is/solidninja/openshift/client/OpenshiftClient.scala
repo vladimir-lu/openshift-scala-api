@@ -10,6 +10,7 @@ import gnieh.diffson.circe._
 import gnieh.diffson._
 import fs2.{Strategy, Task}
 import fs2.async.immutable.Signal
+import is.solidninja.k8s.api.v1.ObjectMeta
 import org.http4s.{BasicCredentials, Credentials, Uri}
 import org.http4s.client.Client
 import org.http4s.client.blaze.{BlazeClientConfig, PooledHttp1Client}
@@ -27,14 +28,22 @@ trait OpenshiftCluster {
 }
 
 trait OpenshiftProject {
-  def pods(): Task[Seq[Pod]]
   def pod(name: String): Task[Option[Pod]]
-  def deploymentConfigs(): Task[Seq[DeploymentConfig]]
+  def pods(): Task[Seq[Pod]]
+
   def deploymentConfig(name: String): Task[Option[DeploymentConfig]]
-  def routes(): Task[Seq[Route]]
+  def deploymentConfigs(): Task[Seq[DeploymentConfig]]
+
   def route(name: String): Task[Option[Route]]
+  def routes(): Task[Seq[Route]]
+
   def services(): Task[Seq[Service]]
   def service(name: String): Task[Option[Service]]
+
+  def createDeploymentConfig(dc: DeploymentConfig): Task[DeploymentConfig]
+  def createRoute(route: Route): Task[Route]
+  def createService(service: Service): Task[Service]
+
   def patchDeploymentConfig(name: String, patch: JsonPatch): Task[DeploymentConfig]
   def patchRoute(name: String, patch: JsonPatch): Task[Route]
   def patchService(name: String, patch: JsonPatch): Task[Service]
@@ -83,7 +92,16 @@ object TestApp extends App {
     cluster <- OpenshiftCluster(url, token, client)
     project <- cluster.project(ProjectId("myproject"))
     dc <- project.deploymentConfig("dnsmasq")
-    patched <- project.patchDeploymentConfig("dnsmasq", testPatch)
+    patched <- project.createRoute(Route(
+      metadata = Some(ObjectMeta(
+        name = Some("dnsmasq2")
+      )),
+      RouteSpec(
+        host = "dnsmasq2",
+        to = RouteTargetReference(kind = "Service", name = "dnsmasq", weight = 100),
+        port = None,
+        wildcardPolicy = None
+    )))
   } yield (dc, patched)
 
   println(res.unsafeRun())

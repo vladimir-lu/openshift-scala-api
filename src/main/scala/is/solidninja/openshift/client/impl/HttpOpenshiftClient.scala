@@ -59,6 +59,15 @@ private[client] class HttpOpenshiftProject(client: HttpOpenshiftClient, projectI
 
   override def patchService(name: String, patch: JsonPatch): Task[v1Service] =
     client.patchService(projectId, name, patch)
+
+  override def createDeploymentConfig(dc: DeploymentConfig): Task[DeploymentConfig] =
+    client.createDeploymentConfig(projectId, dc)
+
+  override def createRoute(route: Route): Task[Route] =
+    client.createRoute(projectId, route)
+
+  override def createService(service: v1Service): Task[v1Service] =
+    client.createService(projectId, service)
 }
 
 private[client] class HttpOpenshiftClient(client: Client, url: Uri, token: Signal[Task, Credentials.Token]) {
@@ -117,6 +126,17 @@ private[client] class HttpOpenshiftClient(client: Client, url: Uri, token: Signa
   def patchRoute(projectId: ProjectId, name: String, thePatch: JsonPatch): Task[Route] =
     patch[Route](namespace(projectId) / "routes" / name, thePatch.asJson)
 
+  def createDeploymentConfig(projectId: ProjectId, dc: DeploymentConfig): Task[DeploymentConfig] =
+    post[DeploymentConfig](namespace(projectId) / "deploymentconfigs", dc)
+
+
+  def createRoute(projectId: ProjectId, route: Route): Task[Route] =
+    post[Route](namespace(projectId) / "routes", route)
+
+  def createService(projectId: ProjectId, service: v1Service): Task[v1Service] =
+    post[v1Service](namespace(projectId) / "services", service)
+
+
   private def getOpt[T: Decoder](uri: Uri): Task[Option[T]] =
     get[T](uri).map(Option(_)).handle {
       case UnexpectedStatus(Status.NotFound) => None
@@ -130,6 +150,12 @@ private[client] class HttpOpenshiftClient(client: Client, url: Uri, token: Signa
         .withBody(patch)
         // override the content-type header
         .map(_.putHeaders(Header("Content-Type", "application/json-patch+json")))
+    )
+
+  private def post[T: Decoder : Encoder](uri: Uri, obj: T): Task[T] =
+    req[T](
+      Request(method = Method.POST, uri = uri)
+          .withBody(obj)(jsonEncoderOf[T])
     )
 
   private def req[T: Decoder](reqT: Request): Task[T] = req[T](Task.now(reqT))
