@@ -41,8 +41,14 @@ private[v1] trait ValueEncoderInstances {
     case Name(name) => Json.fromString(name)
   }
 
-  implicit val encodeSeelector: Encoder[Selector] =
+  implicit val encodeSelector: Encoder[Selector] =
     Encoder.encodeMapLike[Map, String, Json].contramap(_.v)
+
+  implicit val encodeModeMask: Encoder[ModeMask] =
+    Encoder.encodeInt.contramap(_.v)
+
+  implicit val encodeCapability: Encoder[Capability] =
+    Encoder.encodeString.contramap(_.v)
 
   private def timestampToString(ts: Timestamp): String =
     ts.v.format(DateTimeFormatter.ISO_INSTANT)
@@ -65,6 +71,8 @@ trait EncoderInstances extends ValueEncoderInstances {
 
   implicit val encodeLocalObjectReference: Encoder[LocalObjectReference] = deriveEncoder
 
+  implicit val encodeKeyToPath: Encoder[KeyToPath] = deriveEncoder
+
   implicit val encodePodSpec: Encoder[PodSpec] = deriveEncoder
 
   implicit val encodeVolume: Encoder[Volume] = deriveEncoder
@@ -74,6 +82,22 @@ trait EncoderInstances extends ValueEncoderInstances {
   implicit val encodeResourceRequirements: Encoder[ResourceRequirements] = deriveEncoder
 
   implicit val encodePodSecurityContext: Encoder[PodSecurityContext] = deriveEncoder
+
+  implicit val encodeLifecycle: Encoder[Lifecycle] = deriveEncoder
+
+  implicit val encodeProbe: Encoder[Probe] = deriveEncoder
+
+  implicit val encodeExecAction: Encoder[ExecAction] = deriveEncoder
+
+  implicit val encodeHttpGetAction: Encoder[HTTPGetAction] = deriveEncoder
+
+  implicit val encodeHttpHeader: Encoder[HTTPHeader] = deriveEncoder
+
+  implicit val encodeSecurityContext: Encoder[SecurityContext] = deriveEncoder
+
+  implicit val encodeCapabilities: Encoder[Capabilities] = deriveEncoder
+
+  implicit val encodeSELinuxOptions: Encoder[SELinuxOptions] = deriveEncoder
 
   implicit val encodeContainer: Encoder[Container] = deriveEncoder
 
@@ -95,10 +119,40 @@ trait EncoderInstances extends ValueEncoderInstances {
     case sl: ServiceList => sl.asJson
   }
 
-  // FIXME - figure out whether a special instance for TopLevel is needed...
-
   protected[solidninja] def v1Object(kind: String)(json: JsonObject): JsonObject =
     json
       .add("kind", Json.fromString(kind))
       .add("apiVersion", Json.fromString("v1"))
+}
+
+/**
+  * Operations to ease (mainly) working with the high optionality of the Kubernetes and Openshift Objects
+  */
+trait JsonOps {
+
+  implicit class JsonWithoutNulls(val j: Json) {
+
+    /**
+      * Remove all null object values from the json recursively (traversing inside arrays and objects)
+      */
+    def withoutNulls: Json =
+      j.asObject
+        .map(JsonWithoutNulls.removeNullFields)
+        .orElse(j.asArray.map(JsonWithoutNulls.removeNullFields))
+        .getOrElse(j)
+  }
+
+  private object JsonWithoutNulls {
+    def removeNullFields(o: JsonObject): Json =
+      Json.fromJsonObject(
+        o.fields.foldLeft(o) {
+          case (obj, field) if obj(field).exists(_.isNull) => obj.remove(field)
+          case (obj, field) if obj(field).exists(o => o.isObject || o.isArray) =>
+            obj.remove(field).add(field, obj(field).map(_.withoutNulls).get)
+          case (x, _) => x
+        }
+      )
+
+    def removeNullFields(j: Vector[Json]): Json = Json.fromValues(j.map(_.withoutNulls))
+  }
 }

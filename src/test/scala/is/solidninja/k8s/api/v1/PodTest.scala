@@ -7,14 +7,17 @@ import org.scalatest.{FreeSpec, Matchers}
 
 import io.circe._
 import io.circe.literal._
+import io.circe.syntax._
 
 import JsonProtocol._
 
 class PodTest extends FreeSpec with Matchers {
 
   "Pod v1" - {
-    "should decode from a simple example" in {
+    "should decode and reencode from a simple example" in {
       val j: Json = json"""{
+        "kind" : "Pod",
+        "apiVersion" : "v1",
         "metadata": {
           "name": "mongodb-1-deploy",
           "namespace": "myproject",
@@ -39,7 +42,6 @@ class PodTest extends FreeSpec with Matchers {
           "activeDeadlineSeconds": 21600,
           "dnsPolicy": "ClusterFirst",
           "serviceAccountName": "deployer",
-          "serviceAccount": "deployer",
           "nodeName": "172.22.22.60"
         },
         "status": {
@@ -102,22 +104,21 @@ class PodTest extends FreeSpec with Matchers {
 
       val podSpec = PodSpec(
         volumes = Some(Nil),
-        containers = List(
-          Container(
-            image = ImageName("openshift/origin-deployer:v1.5.1"),
-            imagePullPolicy = "IfNotPresent",
-            args = None,
-            command = None,
-            env = Some(Nil),
-            name = Some("deployment"),
-            resources = Some(ResourceRequirements()),
-            terminationMessagePath = Some("/dev/termination-log"),
-            volumeMounts = Some(Nil)
-          )
-        ),
+        containers = Container(
+          image = ImageName("openshift/origin-deployer:v1.5.1"),
+          imagePullPolicy = "IfNotPresent",
+          name = Some("deployment"),
+          env = Some(Nil),
+          resources = Some(ResourceRequirements()),
+          terminationMessagePath = Some("/dev/termination-log"),
+          volumeMounts = Some(Nil)
+        ) :: Nil,
         restartPolicy = Some("Never"),
         terminationGracePeriodSeconds = Some(10),
-        dnsPolicy = Some("ClusterFirst")
+        dnsPolicy = Some("ClusterFirst"),
+        nodeName = Some("172.22.22.60"),
+        serviceAccountName = Some("deployer"),
+        activeDeadlineSeconds = Some(21600)
       )
 
       val expected = Pod(
@@ -126,7 +127,9 @@ class PodTest extends FreeSpec with Matchers {
       )
 
       j.as[Pod] should equal(Right(expected))
-      // FIXME - add test for serialization back to json
+
+      // FIXME - support the status field
+      j.as[Pod].map(_.asJson.withoutNulls) should equal(Right(j.hcursor.downField("status").delete.top.get))
     }
   }
 

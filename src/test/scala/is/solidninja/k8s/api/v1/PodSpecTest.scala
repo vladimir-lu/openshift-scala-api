@@ -7,13 +7,15 @@ import org.scalatest.{FreeSpec, Matchers}
 
 import io.circe._
 import io.circe.literal._
+import io.circe.syntax._
 
 import JsonProtocol._
+import PodSpecTest._
 
 class PodSpecTest extends FreeSpec with Matchers {
 
   "PodSpec v1" - {
-    "should decode for a simple example" in {
+    "should decode and reencode for a simple example" in {
 
       val j: Json = json"""{
         "volumes": [],
@@ -55,14 +57,28 @@ class PodSpecTest extends FreeSpec with Matchers {
         restartPolicy = Some("Never"),
         terminationGracePeriodSeconds = Some(10),
         dnsPolicy = Some("ClusterFirst"),
-        securityContext = Some(PodSecurityContext()),
-        imagePullSecrets = Some(Nil)
+        securityContext = Some(
+          PodSecurityContext(
+            fsGroup = Some(1000040000L),
+            seLinuxOptions = Some(
+              SELinuxOptions(
+                level = Some("s0:c6,c5")
+              ))
+          )),
+        imagePullSecrets = Some(Nil),
+        nodeName = Some("172.22.22.60"),
+        serviceAccountName = Some("deployer"),
+        activeDeadlineSeconds = Some(21600)
       )
 
       j.as[PodSpec] should equal(Right(expected))
-      // FIXME - re-enable test for conversion back to json
-//      j.as[PodSpec].toTry.get.asJson should equal(j)
+      j.as[PodSpec].map(_.asJson.withoutNulls) should equal(Right(removeDeprecatedFields(j)))
     }
   }
 
+}
+
+object PodSpecTest {
+  def removeDeprecatedFields(j: Json): Json =
+    j.hcursor.downField("serviceAccount").delete.top.getOrElse(j)
 }

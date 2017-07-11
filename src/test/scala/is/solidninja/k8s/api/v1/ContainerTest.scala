@@ -4,6 +4,7 @@ package api
 package v1
 
 import org.scalatest.{FreeSpec, Matchers}
+
 import io.circe._
 import io.circe.literal._
 import io.circe.syntax._
@@ -13,7 +14,7 @@ import JsonProtocol._
 class ContainerTest extends FreeSpec with Matchers {
 
   "Container v1" - {
-    "should decode from a simple example" in {
+    "should decode and reencode from a simple example" in {
       val j: Json = json"""{
         "name": "deployment",
         "image": "openshift/origin-deployer:v1.5.1",
@@ -73,11 +74,27 @@ class ContainerTest extends FreeSpec with Matchers {
             VolumeMount(mountPath = "/var/run/secrets/kubernetes.io/serviceaccount",
                         name = "deployer-token-rtf4m",
                         readOnly = Some(true))
+          )),
+        securityContext = Some(
+          SecurityContext(
+            capabilities = Some(
+              Capabilities(
+                drop =
+                  Some(Capability("KILL") :: Capability("MKNOD") :: Capability("SETGID") :: Capability("SETUID") ::
+                    Capability("SYS_CHROOT") :: Nil),
+                add = None
+              )),
+            privileged = Some(false),
+            seLinuxOptions = Some(
+              SELinuxOptions(
+                level = Some("s0:c6,c5")
+              )),
+            runAsUser = Some(1000040000L)
           ))
       )
 
       j.as[Container] should equal(Right(expected))
-      // FIXME add a toJson test
+      j.as[Container].map(_.asJson.withoutNulls) should equal(Right(j))
     }
 
     "should encode from a simple example" in {
@@ -93,13 +110,9 @@ class ContainerTest extends FreeSpec with Matchers {
         imagePullPolicy = "IfNotPresent"
       )
 
-      container.asJson should equal(json"""{
+      container.asJson.withoutNulls should equal(json"""{
         "image" : "openshift/origin-deployer:v1.5.1",
         "imagePullPolicy" : "IfNotPresent",
-        "name" : null,
-        "ports" : null,
-        "args" : null,
-        "command" : null,
         "env" : [
           {
             "name" : "KUBERNETES_MASTER",
@@ -109,10 +122,7 @@ class ContainerTest extends FreeSpec with Matchers {
             "name" : "OPENSHIFT_DEPLOYMENT_NAMESPACE",
             "value" : "myproject"
           }
-        ],
-        "resources" : null,
-        "terminationMessagePath" : null,
-        "volumeMounts" : null
+        ]
       }""")
       container.asJson.as[Container] should equal(Right(container))
     }

@@ -7,7 +7,6 @@ import java.time.{ZoneId, ZonedDateTime}
 import java.time.format.DateTimeFormatter
 
 import cats.syntax.functor._
-
 import io.circe._
 import io.circe.generic.semiauto._
 
@@ -48,6 +47,10 @@ private[v1] trait ValueDecoderInstances {
   implicit val decodeSelector: Decoder[Selector] =
     Decoder.decodeMapLike[Map, String, Json].map(Selector.apply)
 
+  implicit val decodeModeMask: Decoder[ModeMask] = Decoder.decodeInt.map(ModeMask)
+
+  implicit val decodeCapability: Decoder[Capability] = Decoder.decodeString.map(Capability)
+
   private def toTimestamp(s: String): Try[Timestamp] =
     Try(ZonedDateTime.from(DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).parse(s)))
       .map(Timestamp)
@@ -66,6 +69,8 @@ trait DecoderInstances extends ValueDecoderInstances {
 
   implicit val decodePodSpec: Decoder[PodSpec] = deriveDecoder
 
+  implicit val decodeKeyToPath: Decoder[KeyToPath] = deriveDecoder
+
   implicit val decodePersistentVolumeClaimSource: Decoder[PersistentVolumeClaimSource] = deriveDecoder
 
   implicit val decodeSecretVolumeSource: Decoder[SecretVolumeSource] = deriveDecoder
@@ -77,6 +82,22 @@ trait DecoderInstances extends ValueDecoderInstances {
   implicit val decodePodSecurityContext: Decoder[PodSecurityContext] = deriveDecoder
 
   implicit val decodeVolumeMount: Decoder[VolumeMount] = deriveDecoder
+
+  implicit val decodeLifecycle: Decoder[Lifecycle] = deriveDecoder
+
+  implicit val decodeProbe: Decoder[Probe] = deriveDecoder
+
+  implicit val decodeExecAction: Decoder[ExecAction] = deriveDecoder
+
+  implicit val decodeHttpGetAction: Decoder[HTTPGetAction] = deriveDecoder
+
+  implicit val decodeHttpHeader: Decoder[HTTPHeader] = deriveDecoder
+
+  implicit val decodeSecurityContext: Decoder[SecurityContext] = deriveDecoder
+
+  implicit val decodeCapabilities: Decoder[Capabilities] = deriveDecoder
+
+  implicit val decodeSELinuxOptions: Decoder[SELinuxOptions] = deriveDecoder
 
   implicit val decodeContainer: Decoder[Container] = deriveDecoder
 

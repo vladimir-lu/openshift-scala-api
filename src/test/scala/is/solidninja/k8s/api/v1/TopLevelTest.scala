@@ -7,6 +7,7 @@ import org.scalatest.{FreeSpec, Matchers}
 
 import io.circe._
 import io.circe.literal._
+import io.circe.syntax._
 
 import JsonProtocol._
 
@@ -20,7 +21,7 @@ class TopLevelTest extends FreeSpec with Matchers {
         "items": [
           {
             "kind": "Pod",
-            "metadata": null,
+            "apiVersion": "v1",
             "spec": {
               "volumes": [],
               "containers": [
@@ -34,13 +35,11 @@ class TopLevelTest extends FreeSpec with Matchers {
                   "imagePullPolicy": "IfNotPresent"
                 }
               ]
-            },
-            "status": {}
+            }
         },
         {
           "kind": "Service",
           "apiVersion": "v1",
-          "metadata": null,
           "spec": {
               "ports": [
                   {
@@ -61,9 +60,6 @@ class TopLevelTest extends FreeSpec with Matchers {
               },
               "type": "ClusterIP",
               "sessionAffinity": "None"
-          },
-          "status": {
-              "loadBalancer": {}
           }
         }
       ]}"""
@@ -103,8 +99,10 @@ class TopLevelTest extends FreeSpec with Matchers {
         )
       )
 
-      j.hcursor.downField("items").as[List[TopLevel]] should equal(Right(expected))
-      // FIXME - add encoding test back to json
+      val got = j.hcursor.downField("items").as[List[TopLevel]]
+      got should equal(Right(expected))
+
+      got.map(_.asJson.withoutNulls) should equal(Right(j.hcursor.downField("items").focus.get))
     }
   }
 

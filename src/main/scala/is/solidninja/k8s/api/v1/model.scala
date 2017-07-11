@@ -32,6 +32,10 @@ case class ImageName(v: String) extends AnyVal {
   // TODO: mechanism for extracting version information?
 }
 
+case class ModeMask(v: Int) extends AnyVal
+
+case class Capability(v: String) extends AnyVal
+
 trait HasMetadata {
   def metadata: Option[ObjectMeta]
 }
@@ -74,7 +78,16 @@ case class PodSpec(volumes: Option[List[Volume]],
                    terminationGracePeriodSeconds: Option[Int] = None,
                    dnsPolicy: Option[String] = None,
                    securityContext: Option[PodSecurityContext] = None,
-                   imagePullSecrets: Option[List[LocalObjectReference]] = None)
+                   imagePullSecrets: Option[List[LocalObjectReference]] = None,
+                   activeDeadlineSeconds: Option[Int] = None,
+                   hostIPC: Option[Boolean] = None,
+                   hostNetwork: Option[Boolean] = None,
+                   hostPID: Option[Boolean] = None,
+                   hostname: Option[String] = None,
+                   nodeName: Option[String] = None,
+                   nodeSelector: Option[Selector] = None,
+                   serviceAccountName: Option[String] = None,
+                   subdomain: Option[String] = None)
 
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#localobjectreference-v1 LocalObjectReference v1]]
@@ -93,9 +106,75 @@ case class Container(image: ImageName,
                      env: Option[List[EnvVar]] = None,
                      resources: Option[ResourceRequirements] = None,
                      terminationMessagePath: Option[String] = None,
-                     volumeMounts: Option[List[VolumeMount]] = None)
+                     volumeMounts: Option[List[VolumeMount]] = None,
+                     securityContext: Option[SecurityContext] = None,
+                     lifecycle: Option[Lifecycle] = None,
+                     livenessProbe: Option[Probe] = None,
+                     readinessProbe: Option[Probe] = None,
+                     stdin: Option[Boolean] = None,
+                     stdinOnce: Option[Boolean] = None,
+                     tty: Option[Boolean] = None,
+                     workingDir: Option[String] = None)
 
 // FIXME: ImagePullPolicy not a string
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#lifecycle-v1 Lifecycle v1]]
+  */
+case class Lifecycle( /* FIXME */ )
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#probe-v1 Probe v1]]
+  */
+case class Probe(exec: Option[ExecAction] = None,
+                 failureThreshold: Option[Int] = None,
+                 httpGet: Option[HTTPGetAction] = None,
+                 initialDelaySeconds: Option[Int] = None,
+                 periodSeconds: Option[Int] = None,
+                 successThreshold: Option[Int] = None,
+                 timeoutSeconds: Option[Int] = None)
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#execaction-v1 ExecAction v1]]
+  */
+case class ExecAction(command: List[String])
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#httpgetaction-v1 HTTPGetAction v1]]
+  */
+case class HTTPGetAction(path: String,
+                         port: PortOrName,
+                         scheme: Option[String] = None,
+                         host: Option[String] = None,
+                         httpHeaders: Option[List[HTTPHeader]] = None)
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#httpheader-v1 HTTPHeader v1]]
+  */
+case class HTTPHeader(name: String, value: String)
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#securitycontext-v1 SecurityContext v1]]
+  */
+case class SecurityContext(capabilities: Option[Capabilities] = None,
+                           privileged: Option[Boolean] = None,
+                           readOnlyRootFilesystem: Option[Boolean] = None,
+                           runAsNonRoot: Option[Boolean] = None,
+                           runAsUser: Option[Long] = None,
+                           seLinuxOptions: Option[SELinuxOptions] = None)
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#capabilities-v1 Capabilities v1]]
+  */
+case class Capabilities(add: Option[List[Capability]], drop: Option[List[Capability]])
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#selinuxoptions-v1 SELinuxOptions v1]]
+  */
+case class SELinuxOptions(level: Option[String] = None,
+                          role: Option[String] = None,
+                          `type`: Option[String] = None,
+                          user: Option[String] = None)
 
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#volumemount-v1 v1 VolumeMount]]
@@ -108,7 +187,11 @@ case class VolumeMount(mountPath: String,
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#podsecuritycontext-v1 v1 PodSecurityContext]]
   */
-case class PodSecurityContext()
+case class PodSecurityContext(fsGroup: Option[Long] = None,
+                              runAsNonRoot: Option[Boolean] = None,
+                              runAsUser: Option[Long] = None,
+                              seLinuxOptions: Option[SELinuxOptions] = None,
+                              supplementalGroups: Option[List[Long]] = None)
 
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#containerport-v1 v1 ContainerPort]]
@@ -130,10 +213,19 @@ case class Volume(name: String,
                   persistentVolumeClaim: Option[PersistentVolumeClaimSource] = None,
                   secret: Option[SecretVolumeSource] = None)
 
+// FIXME - volume should be ADT
+
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#secretvolumesource-v1 SecretVolumeSource v1]]
   */
-case class SecretVolumeSource(secretName: String)
+case class SecretVolumeSource(secretName: String,
+                              items: Option[List[KeyToPath]] = None,
+                              defaultMode: Option[ModeMask] = None)
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#keytopath-v1 KeyToPath v1]]
+  */
+case class KeyToPath(key: String, path: String, mode: ModeMask)
 
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#persistentvolumeclaimvolumesource-v1 PersistentVolumeClaimSource v1]]

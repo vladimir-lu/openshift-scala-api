@@ -121,7 +121,7 @@ private[client] class HttpOpenshiftClient(client: Client, url: Uri, token: Signa
     patch[DeploymentConfig](namespace(projectId) / "deploymentconfigs" / name, thePatch.asJson)
 
   def patchService(projectId: ProjectId, name: String, thePatch: JsonPatch): Task[v1Service] =
-    patch[v1Service](namespace(projectId) / "services" / name, thePatch.asJson)
+    patch[v1Service](namespacek8s(projectId) / "services" / name, thePatch.asJson)
 
   def patchRoute(projectId: ProjectId, name: String, thePatch: JsonPatch): Task[Route] =
     patch[Route](namespace(projectId) / "routes" / name, thePatch.asJson)
@@ -133,7 +133,7 @@ private[client] class HttpOpenshiftClient(client: Client, url: Uri, token: Signa
     post[Route](namespace(projectId) / "routes", route)
 
   def createService(projectId: ProjectId, service: v1Service): Task[v1Service] =
-    post[v1Service](namespace(projectId) / "services", service)
+    post[v1Service](namespacek8s(projectId) / "services", service)
 
   private def getOpt[T: Decoder](uri: Uri): Task[Option[T]] =
     get[T](uri).map(Option(_)).handle {

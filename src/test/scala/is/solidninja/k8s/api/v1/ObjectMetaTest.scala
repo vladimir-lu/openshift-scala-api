@@ -53,7 +53,7 @@ class ObjectMetaTest extends FreeSpec with Matchers {
       )
 
       j.as[ObjectMeta] should equal(Right(expected))
-      j.as[ObjectMeta].toTry.get.asJson should equal(j)
+      j.as[ObjectMeta].map(_.asJson.withoutNulls) should equal(Right(j))
     }
   }
 

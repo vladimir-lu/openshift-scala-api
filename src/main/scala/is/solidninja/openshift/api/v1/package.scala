@@ -3,6 +3,7 @@ package openshift
 package api
 
 import cats.syntax.EitherSyntax
+import is.solidninja.k8s.api.v1.JsonOps
 
 import scala.language.implicitConversions
 
@@ -31,5 +32,5 @@ package object v1 extends EitherSyntax {
   implicit def liftToEitherTopLevel(l: TopLevel): EitherTopLevel = Left(l)
   implicit def liftToEitherTopLevel(r: is.solidninja.k8s.api.v1.TopLevel): EitherTopLevel = Right(r)
 
-  object JsonProtocol extends EncoderInstances with DecoderInstances
+  object JsonProtocol extends EncoderInstances with DecoderInstances with JsonOps
 }

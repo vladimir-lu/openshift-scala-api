@@ -14,13 +14,12 @@ import JsonProtocol._
 class ServiceTest extends FreeSpec with Matchers {
 
   "Service v1" - {
-    "should decode from a simple example" in {
+    "should decode and reencode from a simple example" in {
       val j: Json = json"""{
         "kind": "Service",
         "apiVersion": "v1",
         "metadata": {
             "name": "dnsmasq",
-            "creationTimestamp": null,
             "labels": {
                 "app": "dnsmasq"
             },
@@ -91,7 +90,8 @@ class ServiceTest extends FreeSpec with Matchers {
 
       j.as[Service] should equal(Right(expected))
 
-      // FIXME test for encoding back to json
+      // FIXME add status field
+      j.as[Service].map(_.asJson.withoutNulls) should equal(Right(j.hcursor.downField("status").delete.top.get))
     }
 
     "should encode a simple service" in {
@@ -115,32 +115,20 @@ class ServiceTest extends FreeSpec with Matchers {
         )
       )
 
-      service.asJson should equal(json"""{
+      service.asJson.withoutNulls should equal(json"""{
         "kind" : "Service",
         "apiVersion" : "v1",
         "metadata" : {
           "name" : "dnsmasq",
-          "namespace" : null,
           "labels" : {
             "app" : "dnsmasq"
           },
           "annotations" : {
             "openshift.io/generated-by" : "OpenShiftWebConsole"
-          },
-          "uid" : null,
-          "resourceVersion" : null,
-          "creationTimestamp" : null,
-          "selfLink" : null
+          }
         },
         "spec" : {
-          "type" : "ClusterIP",
-          "clusterIP" : null,
-          "externalIPs" : null,
-          "externalName" : null,
-          "loadBalancerIP" : null,
-          "ports" : null,
-          "selector" : null,
-          "sessionAffinity" : null
+          "type" : "ClusterIP"
         }
       }""")
     }
