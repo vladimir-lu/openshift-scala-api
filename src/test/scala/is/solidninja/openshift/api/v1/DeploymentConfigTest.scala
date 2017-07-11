@@ -9,6 +9,7 @@ import org.scalatest.{FreeSpec, Matchers}
 
 import io.circe._
 import io.circe.literal._
+import io.circe.syntax._
 
 import JsonProtocol._
 
@@ -17,7 +18,7 @@ import is.solidninja.k8s.api.v1._
 class DeploymentConfigTest extends FreeSpec with Matchers {
 
   "DeploymentConfig v1" - {
-    "should decode based on a simple example" in {
+    "should decode and reencode based on a simple example" in {
       val j: Json = json"""{
       "kind": "DeploymentConfig",
       "apiVersion": "v1",
@@ -77,7 +78,6 @@ class DeploymentConfigTest extends FreeSpec with Matchers {
         },
         "template": {
           "metadata": {
-            "creationTimestamp": null,
             "labels": {
               "app": "dnsmasq",
               "deploymentconfig": "dnsmasq"
@@ -206,11 +206,7 @@ class DeploymentConfigTest extends FreeSpec with Matchers {
                 )),
                 annotations = Some(Annotations(
                   Map("openshift.io/generated-by" -> Json.fromString("OpenShiftWebConsole"))
-                )),
-                uid = None,
-                resourceVersion = None,
-                creationTimestamp = None,
-                selfLink = None
+                ))
               )),
               spec = PodSpec(
                 volumes = None,
@@ -254,11 +250,16 @@ class DeploymentConfigTest extends FreeSpec with Matchers {
             uid = Some(Uid("823ede65-5c06-11e7-ab5a-c26606f097c1")),
             resourceVersion = Some(Version("904")),
             creationTimestamp = Some(Timestamp(ZonedDateTime.of(2017, 6, 28, 13, 34, 28, 0, ZoneId.of("UTC")))),
-            selfLink = Some(Path("/oapi/v1/namespaces/myproject/deploymentconfigs/dnsmasq"))
+            selfLink = Some(Path("/oapi/v1/namespaces/myproject/deploymentconfigs/dnsmasq")),
+            generation = Some(2)
           ))
       )
 
       j.as[DeploymentConfig] should equal(Right(expected))
+
+      // FIXME - status field
+      j.as[DeploymentConfig].map(_.copy(status = None).asJson.withoutNulls) should equal(
+        Right(j.hcursor.downField("status").delete.top.get))
     }
   }
 

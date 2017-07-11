@@ -9,19 +9,19 @@ import is.solidninja.k8s.api.v1._
 
 import io.circe._
 import io.circe.literal._
+import io.circe.syntax._
 
 import JsonProtocol._
 
 class RouteTest extends FreeSpec with Matchers {
 
   "Route v1" - {
-    "should decode based on a simple example" in {
+    "should decode and reencode based on a simple example" in {
       val j: Json = json"""{
           "kind": "Route",
           "apiVersion": "v1",
           "metadata": {
               "name": "dnsmasq",
-              "creationTimestamp": null,
               "annotations": {
                   "openshift.io/host.generated": "true"
               }
@@ -76,7 +76,9 @@ class RouteTest extends FreeSpec with Matchers {
       )
 
       j.as[Route] should equal(Right(expected))
-      // FIXME - add test for encoding back to json
+
+      // FIXME - add status field to test
+      j.as[Route].map(_.asJson.withoutNulls) should equal(Right(j.hcursor.downField("status").delete.top.get))
     }
   }
 

@@ -9,13 +9,14 @@ import is.solidninja.k8s.api.v1._
 
 import io.circe._
 import io.circe.literal._
+import io.circe.syntax._
 
 import JsonProtocol._
 
 class TopLevelTest extends FreeSpec with Matchers {
 
   "Oapi TopLevel" - {
-    "should decode from a list of routes and deploymentconfigs" in {
+    "should decode and reencode from a list of routes and deploymentconfigs" in {
       val j: Json = json"""{
       "items": [
         {
@@ -33,8 +34,7 @@ class TopLevelTest extends FreeSpec with Matchers {
                   "targetPort": "53-tcp"
               },
               "wildcardPolicy": "None"
-          },
-          "status": {}
+          }
         },
         {
           "kind": "DeploymentConfig",
@@ -76,8 +76,7 @@ class TopLevelTest extends FreeSpec with Matchers {
                 "securityContext": {}
               }
             }
-          },
-          "status": null
+          }
         }
       ]}"""
 
@@ -145,7 +144,9 @@ class TopLevelTest extends FreeSpec with Matchers {
         )
       )
 
-      j.hcursor.downField("items").as[List[TopLevel]] should equal(Right(expected))
+      val got = j.hcursor.downField("items").as[List[TopLevel]]
+      got should equal(Right(expected))
+      got.map(_.asJson.withoutNulls).map(i => Json.obj("items" -> i)) should equal (Right(j))
     }
   }
 
@@ -156,7 +157,6 @@ class TopLevelTest extends FreeSpec with Matchers {
         {
           "kind": "Route",
           "apiVersion": "v1",
-          "metadata": null,
           "spec": {
               "host": "dnsmasq-myproject.192.168.42.131.nip.io",
               "to": {
@@ -168,13 +168,11 @@ class TopLevelTest extends FreeSpec with Matchers {
                   "targetPort": "53-tcp"
               },
               "wildcardPolicy": "None"
-          },
-          "status": {}
+          }
         },
         {
           "kind": "Service",
           "apiVersion": "v1",
-          "metadata": null,
           "spec": {
               "ports": [
                   {
@@ -195,9 +193,6 @@ class TopLevelTest extends FreeSpec with Matchers {
               },
               "type": "ClusterIP",
               "sessionAffinity": "None"
-          },
-          "status": {
-              "loadBalancer": {}
           }
         }
       ]}"""
@@ -233,8 +228,9 @@ class TopLevelTest extends FreeSpec with Matchers {
           ))
       )
 
-      j.hcursor.downField("items").as[List[EitherTopLevel]] should equal(Right(expected))
-      // FIXME - test for encoding back to json
+      val got = j.hcursor.downField("items").as[List[EitherTopLevel]]
+      got should equal(Right(expected))
+      got.map(_.asJson.withoutNulls).map(i => Json.obj("items" -> i)) should equal (Right(j))
     }
   }
 

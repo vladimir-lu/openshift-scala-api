@@ -247,21 +247,20 @@ case class ObjectMeta(name: Option[String] = None,
                       uid: Option[Uid] = None,
                       resourceVersion: Option[Version] = None,
                       creationTimestamp: Option[Timestamp] = None,
-                      selfLink: Option[Path] = None)
+                      selfLink: Option[Path] = None,
+                      clusterName: Option[String] = None,
+                      deletionGracePeriodSeconds: Option[Int] = None,
+                      deletionTimestamp: Option[Int] = None,
+                      finalizers: Option[List[String]] = None,
+                      generateName: Option[String] = None,
+                      generation: Option[Int] = None)
 
 object ObjectMeta {
   def apply(objectName: String,
             namespace: Namespace,
             labels: Map[String, String],
             annotations: Annotations): ObjectMeta =
-    ObjectMeta(Some(objectName),
-               Some(namespace),
-               Some(labels),
-               Some(annotations),
-               uid = None,
-               resourceVersion = None,
-               creationTimestamp = None,
-               selfLink = None)
+    ObjectMeta(Some(objectName), Some(namespace), Some(labels), Some(annotations))
 }
 
 /**

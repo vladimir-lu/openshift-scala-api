@@ -6,6 +6,7 @@ package v1
 import org.scalatest.{FreeSpec, Matchers}
 
 import io.circe.literal._
+import io.circe.syntax._
 
 import is.solidninja.k8s.api.v1._
 
@@ -48,9 +49,7 @@ class TemplateListTest extends FreeSpec with Matchers {
       )
 
       j.as[TemplateList] should equal(Right(expected))
-
-//      j.as[TemplateList].toTry.get.asJson should equal(j)
-      // FIXME - test for encoding back to json
+      j.as[TemplateList].map(_.asJson.withoutNulls) should equal(Right(j))
     }
   }
 
