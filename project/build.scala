@@ -1,6 +1,7 @@
 import sbt._
 import Keys._
-import xml.Group
+
+import com.typesafe.sbt.SbtPgp.autoImport._
 
 object build {
 
@@ -21,25 +22,23 @@ object build {
   }
 
   val mavenCentralSettings = Seq(
-    homepage := Some(new URL("https://github.com/json4s/json4s")),
+    description := "API client for OpenShift Origin/Kubernetes",
+    homepage := Some(url("https://github.com/solidninja/openshift-scala-api")),
     startYear := Some(2017),
-    licenses := Seq(("MIT", new URL("https://opensource.org/licenses/mit-license.php"))),
-    pomExtra := {
-      pomExtra.value ++ Group(
-        <scm>
-          <url>https://github.com/solidninja/openshift-scala-api</url>
-          <connection>scm:git:https://github.com/solidninja/openshift-scala-api</connection>
-        </scm>
-          <developers>
-            <developer>
-              <id>vladimir-lu</id>
-              <name>Vladimir Lushnikov</name>
-              <organization>SOLID Ninja Ltd.</organization>
-              <organizationUrl>https://solidninja.is</organizationUrl>
-            </developer>
-          </developers>
+    licenses += "MIT" -> url("https://opensource.org/licenses/mit-license.php"),
+    developers := List(
+      Developer(
+        id = "vladimir-lu",
+        name = "Vladimir Lushnikov",
+        email = "vladimir@solidninja.is",
+        url = url("https://solidninja.is")
       )
-    }
+    ),
+    scmInfo := Some(ScmInfo(
+      url("https://github.com/solidninja/openshift-scala-api"),
+      "scm:git:https://github.com/solidninja/openshift-scala-api.git",
+      Some(s"scm:git:git@github.com:solidninja/openshift-scala-api.git")
+    ))
   )
 
   val commonSettings = mavenCentralSettings ++ Seq(
@@ -68,5 +67,16 @@ object build {
     javacOptions ++= Seq("-target", "1.8", "-source", "1.8"),
     manifestSetting,
     crossVersion := CrossVersion.binary
+  )
+
+  val publishSettings = Seq(
+    publishTo := Some(
+      if (isSnapshot.value)
+        Opts.resolver.sonatypeSnapshots
+      else
+        Opts.resolver.sonatypeStaging
+    ),
+    publishMavenStyle := true,
+    publishArtifact in Test := false
   )
 }
