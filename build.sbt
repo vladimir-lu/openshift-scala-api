@@ -5,7 +5,8 @@ lazy val root = Project(
   id = "openshift-client",
   base = file("."),
   settings = commonSettings ++ Seq(
-    libraryDependencies ++= circe ++ diffson ++ http4s ++ fs2 ++ scalatest ++ runtime,
+    libraryDependencies ++=
+      circe ++ diffson ++ http4s ++ fs2 ++ scalatest ++ testBlazeHttp ++ runtime,
     scalafmtOnCompile := true
   )
 )

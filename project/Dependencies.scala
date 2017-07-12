@@ -2,8 +2,8 @@ import sbt._
 
 object Dependencies {
   val http4s = Seq(
-    "org.http4s" %% "http4s-blaze-client" % "0.17.0-M3",
-    "org.http4s" %% "http4s-circe" % "0.17.0-M3"
+    "org.http4s" %% "http4s-circe" % "0.17.0-M3",
+    "org.http4s" %% "http4s-client" % "0.17.0-M3"
   )
 
   val diffson = Seq(
@@ -21,6 +21,10 @@ object Dependencies {
 
   val scalatest = Seq(
     "org.scalatest" %% "scalatest" % "3.0.1" % "test"
+  )
+
+  val testBlazeHttp = Seq(
+    "org.http4s" %% "http4s-blaze-client" % "0.17.0-M3" % "test"
   )
 
   val runtime = Seq(

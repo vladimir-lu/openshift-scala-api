@@ -146,7 +146,7 @@ class TopLevelTest extends FreeSpec with Matchers {
 
       val got = j.hcursor.downField("items").as[List[TopLevel]]
       got should equal(Right(expected))
-      got.map(_.asJson.withoutNulls).map(i => Json.obj("items" -> i)) should equal (Right(j))
+      got.map(_.asJson.withoutNulls).map(i => Json.obj("items" -> i)) should equal(Right(j))
     }
   }
 
@@ -230,7 +230,7 @@ class TopLevelTest extends FreeSpec with Matchers {
 
       val got = j.hcursor.downField("items").as[List[EitherTopLevel]]
       got should equal(Right(expected))
-      got.map(_.asJson.withoutNulls).map(i => Json.obj("items" -> i)) should equal (Right(j))
+      got.map(_.asJson.withoutNulls).map(i => Json.obj("items" -> i)) should equal(Right(j))
     }
   }
 
