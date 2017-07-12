@@ -28,7 +28,12 @@ class ContainerTest extends FreeSpec with Matchers {
             "value": "myproject"
           }
         ],
-        "resources": {},
+        "resources": {
+          "requests": {
+            "cpu": "500m",
+            "memory": "1Gi"
+          }
+        },
         "volumeMounts": [
           {
             "name": "deployer-token-rtf4m",
@@ -67,7 +72,14 @@ class ContainerTest extends FreeSpec with Matchers {
           )),
         image = ImageName("openshift/origin-deployer:v1.5.1"),
         imagePullPolicy = "IfNotPresent",
-        resources = Some(ResourceRequirements()),
+        resources = Some(
+          ResourceRequirements(
+            requests = Some(
+              CpuMemory(
+                cpu = Some("500m"),
+                memory = Some("1Gi")
+              ))
+          )),
         terminationMessagePath = Some("/dev/termination-log"),
         volumeMounts = Some(
           List(

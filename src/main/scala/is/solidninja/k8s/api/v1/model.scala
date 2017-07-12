@@ -204,7 +204,13 @@ case class ContainerPort(containerPort: Int,
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#resourcerequirements-v1 v1 ResourceRequirements]]
   */
-case class ResourceRequirements( /* FIXME */ )
+case class ResourceRequirements(requests: Option[CpuMemory] = None, limits: Option[CpuMemory] = None)
+
+/**
+  * Implementation-defined
+  * @see [[https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/]]
+  */
+case class CpuMemory(cpu: Option[String] = None, memory: Option[String] = None)
 
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#volume-v1 Volume v1]]

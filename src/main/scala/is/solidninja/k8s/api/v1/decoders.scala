@@ -101,6 +101,8 @@ trait DecoderInstances extends ValueDecoderInstances {
 
   implicit val decodeContainer: Decoder[Container] = deriveDecoder
 
+  implicit val decodeCpuMemory: Decoder[CpuMemory] = deriveDecoder
+
   implicit val decodeResourceRequirements: Decoder[ResourceRequirements] = deriveDecoder
 
   implicit val decodeEnvVar: Decoder[EnvVar] = Decoder.instance(c =>
