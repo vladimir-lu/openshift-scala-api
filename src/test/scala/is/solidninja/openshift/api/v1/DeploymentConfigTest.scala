@@ -161,16 +161,16 @@ class DeploymentConfigTest extends FreeSpec with Matchers {
             `type` = "Rolling",
             rollingParams = Some(
               RollingDeploymentStrategyParams(
-                updatePeriodSeconds = Some(1),
-                intervalSeconds = Some(1),
-                timeoutSeconds = Some(600),
+                updatePeriodSeconds = Some(Seconds(1)),
+                intervalSeconds = Some(Seconds(1)),
+                timeoutSeconds = Some(Seconds(600)),
                 maxUnavailable = Some("25%"),
                 maxSurge = Some("25%")
               )),
             labels = None,
             annotations = None,
             resources = Some(ResourceRequirements()),
-            activeDeadlineSeconds = Some(21600)
+            activeDeadlineSeconds = Some(Seconds(21600))
           ),
           triggers = List(
             DeploymentTriggerPolicy(`type` = "ConfigChange", imageChangeParams = None),
@@ -229,7 +229,7 @@ class DeploymentConfigTest extends FreeSpec with Matchers {
                   )
                 ),
                 restartPolicy = Some("Always"),
-                terminationGracePeriodSeconds = Some(30),
+                terminationGracePeriodSeconds = Some(Seconds(30)),
                 securityContext = Some(PodSecurityContext()),
                 dnsPolicy = Some("ClusterFirst")
               )

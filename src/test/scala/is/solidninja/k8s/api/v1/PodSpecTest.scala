@@ -55,7 +55,7 @@ class PodSpecTest extends FreeSpec with Matchers {
           resources = Some(ResourceRequirements())
         ) :: Nil,
         restartPolicy = Some("Never"),
-        terminationGracePeriodSeconds = Some(10),
+        terminationGracePeriodSeconds = Some(Seconds(10)),
         dnsPolicy = Some("ClusterFirst"),
         securityContext = Some(
           PodSecurityContext(
@@ -68,7 +68,7 @@ class PodSpecTest extends FreeSpec with Matchers {
         imagePullSecrets = Some(Nil),
         nodeName = Some("172.22.22.60"),
         serviceAccountName = Some("deployer"),
-        activeDeadlineSeconds = Some(21600)
+        activeDeadlineSeconds = Some(Seconds(21600))
       )
 
       j.as[PodSpec] should equal(Right(expected))

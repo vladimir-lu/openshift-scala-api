@@ -50,6 +50,9 @@ private[v1] trait ValueEncoderInstances {
   implicit val encodeCapability: Encoder[Capability] =
     Encoder.encodeString.contramap(_.v)
 
+  implicit val encodeSeconds: Encoder[Seconds] =
+    Encoder.encodeLong.contramap(_.v.toSeconds)
+
   private def timestampToString(ts: Timestamp): String =
     ts.v.format(DateTimeFormatter.ISO_INSTANT)
 

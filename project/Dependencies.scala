@@ -27,7 +27,7 @@ object Dependencies {
     "org.http4s" %% "http4s-blaze-client" % "0.17.0-M3" % "test"
   )
 
-  val runtime = Seq(
-    "ch.qos.logback" % "logback-classic" % "1.2.3" % "runtime"
+  val testLogging = Seq(
+    "ch.qos.logback" % "logback-classic" % "1.2.3" % "test"
   )
 }

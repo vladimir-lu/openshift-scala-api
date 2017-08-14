@@ -99,18 +99,17 @@ class TopLevelTest extends FreeSpec with Matchers {
           spec = DeploymentConfigSpec(
             strategy = DeploymentStrategy(
               `type` = "Rolling",
-              rollingParams = Some(
-                RollingDeploymentStrategyParams(
-                  updatePeriodSeconds = Some(1),
-                  intervalSeconds = Some(1),
-                  timeoutSeconds = Some(600),
-                  maxUnavailable = Some("25%"),
-                  maxSurge = Some("25%")
-                )),
+              rollingParams = Some(RollingDeploymentStrategyParams(
+                updatePeriodSeconds = Some(Seconds(1)),
+                intervalSeconds = Some(Seconds(1)),
+                timeoutSeconds = Some(Seconds(600)),
+                maxUnavailable = Some("25%"),
+                maxSurge = Some("25%")
+              )),
               labels = None,
               annotations = None,
               resources = Some(ResourceRequirements()),
-              activeDeadlineSeconds = Some(21600)
+              activeDeadlineSeconds = Some(Seconds(21600))
             ),
             triggers = Nil,
             replicas = 1,
@@ -133,7 +132,7 @@ class TopLevelTest extends FreeSpec with Matchers {
                     terminationMessagePath = Some("/dev/termination-log")
                   )),
                   restartPolicy = Some("Always"),
-                  terminationGracePeriodSeconds = Some(30),
+                  terminationGracePeriodSeconds = Some(Seconds(30)),
                   dnsPolicy = Some("ClusterFirst"),
                   securityContext = Some(PodSecurityContext())
                 )

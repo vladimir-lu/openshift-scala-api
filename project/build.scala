@@ -34,18 +34,19 @@ object build {
         url = url("https://solidninja.is")
       )
     ),
-    scmInfo := Some(ScmInfo(
-      url("https://github.com/solidninja/openshift-scala-api"),
-      "scm:git:https://github.com/solidninja/openshift-scala-api.git",
-      Some(s"scm:git:git@github.com:solidninja/openshift-scala-api.git")
-    ))
+    scmInfo := Some(
+      ScmInfo(
+        url("https://github.com/solidninja/openshift-scala-api"),
+        "scm:git:https://github.com/solidninja/openshift-scala-api.git",
+        Some(s"scm:git:git@github.com:solidninja/openshift-scala-api.git")
+      ))
   )
 
   val commonSettings = mavenCentralSettings ++ Seq(
     organization := "is.solidninja.openshift",
     version := "0.0.2",
-    scalaVersion := "2.12.2",
-    crossScalaVersions := Seq("2.11.11", "2.12.2"),
+    scalaVersion := "2.12.3",
+    crossScalaVersions := Seq("2.11.11", "2.12.3"),
     scalacOptions ++= Seq(
       "-deprecation",
       "-encoding",

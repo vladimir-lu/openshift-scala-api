@@ -51,6 +51,8 @@ private[v1] trait ValueDecoderInstances {
 
   implicit val decodeCapability: Decoder[Capability] = Decoder.decodeString.map(Capability)
 
+  implicit val decodeSeconds: Decoder[Seconds] = Decoder.decodeLong.map(Seconds.apply)
+
   private def toTimestamp(s: String): Try[Timestamp] =
     Try(ZonedDateTime.from(DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).parse(s)))
       .map(Timestamp)

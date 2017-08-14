@@ -7,6 +7,8 @@ import java.time.ZonedDateTime
 
 import io.circe.Json
 
+import scala.concurrent.duration.Duration
+
 // FIXME: Incomplete mappings
 
 case class IPAddress(v: String) extends AnyVal
@@ -35,6 +37,16 @@ case class ImageName(v: String) extends AnyVal {
 case class ModeMask(v: Int) extends AnyVal
 
 case class Capability(v: String) extends AnyVal
+
+case class Seconds(v: Duration) extends AnyVal
+
+object Seconds {
+  import scala.concurrent.duration._
+
+  def apply(s: Long): Seconds = Seconds(s.seconds)
+
+  implicit def secondsToDuration(s: Seconds): Duration = s.v
+}
 
 trait HasMetadata {
   def metadata: Option[ObjectMeta]
@@ -75,11 +87,11 @@ case class PodList(metadata: Option[ObjectMeta], items: List[Pod]) extends V1Obj
 case class PodSpec(volumes: Option[List[Volume]],
                    containers: List[Container],
                    restartPolicy: Option[String] = None,
-                   terminationGracePeriodSeconds: Option[Int] = None,
+                   terminationGracePeriodSeconds: Option[Seconds] = None,
                    dnsPolicy: Option[String] = None,
                    securityContext: Option[PodSecurityContext] = None,
                    imagePullSecrets: Option[List[LocalObjectReference]] = None,
-                   activeDeadlineSeconds: Option[Int] = None,
+                   activeDeadlineSeconds: Option[Seconds] = None,
                    hostIPC: Option[Boolean] = None,
                    hostNetwork: Option[Boolean] = None,
                    hostPID: Option[Boolean] = None,
@@ -129,10 +141,10 @@ case class Lifecycle( /* FIXME */ )
 case class Probe(exec: Option[ExecAction] = None,
                  failureThreshold: Option[Int] = None,
                  httpGet: Option[HTTPGetAction] = None,
-                 initialDelaySeconds: Option[Int] = None,
-                 periodSeconds: Option[Int] = None,
+                 initialDelaySeconds: Option[Seconds] = None,
+                 periodSeconds: Option[Seconds] = None,
                  successThreshold: Option[Int] = None,
-                 timeoutSeconds: Option[Int] = None)
+                 timeoutSeconds: Option[Seconds] = None)
 
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#execaction-v1 ExecAction v1]]
@@ -255,7 +267,7 @@ case class ObjectMeta(name: Option[String] = None,
                       creationTimestamp: Option[Timestamp] = None,
                       selfLink: Option[Path] = None,
                       clusterName: Option[String] = None,
-                      deletionGracePeriodSeconds: Option[Int] = None,
+                      deletionGracePeriodSeconds: Option[Seconds] = None,
                       deletionTimestamp: Option[Int] = None,
                       finalizers: Option[List[String]] = None,
                       generateName: Option[String] = None,

@@ -3,7 +3,7 @@ package openshift
 package api
 package v1
 
-import is.solidninja.k8s.api.v1.{Annotations, ImageName, ObjectMeta, PodSpec, ResourceRequirements, Selector}
+import is.solidninja.k8s.api.v1.{Annotations, ImageName, ObjectMeta, PodSpec, ResourceRequirements, Seconds, Selector}
 
 sealed trait TopLevel extends HasMetadata {
   def kind: String
@@ -64,7 +64,7 @@ case class DeploymentStrategy(`type`: String,
                               resources: Option[ResourceRequirements],
                               labels: Option[Map[String, String]],
                               annotations: Option[Annotations],
-                              activeDeadlineSeconds: Option[Int])
+                              activeDeadlineSeconds: Option[Seconds])
 
 // FIXME - customParams
 // FIXME - recreateParams
@@ -72,9 +72,9 @@ case class DeploymentStrategy(`type`: String,
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-rollingdeploymentstrategyparams v1 RollingDeploymentStrategyParams]]
   */
-case class RollingDeploymentStrategyParams(updatePeriodSeconds: Option[Int],
-                                           intervalSeconds: Option[Int],
-                                           timeoutSeconds: Option[Int],
+case class RollingDeploymentStrategyParams(updatePeriodSeconds: Option[Seconds],
+                                           intervalSeconds: Option[Seconds],
+                                           timeoutSeconds: Option[Seconds],
                                            maxUnavailable: Option[String],
                                            maxSurge: Option[String])
 
