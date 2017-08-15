@@ -71,7 +71,7 @@ class ContainerTest extends FreeSpec with Matchers {
             EnvVar("OPENSHIFT_DEPLOYMENT_NAMESPACE", "myproject")
           )),
         image = ImageName("openshift/origin-deployer:v1.5.1"),
-        imagePullPolicy = "IfNotPresent",
+        imagePullPolicy = Some("IfNotPresent"),
         resources = Some(
           ResourceRequirements(
             requests = Some(
@@ -119,7 +119,7 @@ class ContainerTest extends FreeSpec with Matchers {
             EnvVar("OPENSHIFT_DEPLOYMENT_NAMESPACE", "myproject")
           )),
         image = ImageName("openshift/origin-deployer:v1.5.1"),
-        imagePullPolicy = "IfNotPresent"
+        imagePullPolicy = Some("IfNotPresent")
       )
 
       container.asJson.withoutNulls should equal(json"""{

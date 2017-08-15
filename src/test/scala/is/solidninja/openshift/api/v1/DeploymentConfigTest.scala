@@ -188,8 +188,8 @@ class DeploymentConfigTest extends FreeSpec with Matchers {
                   resourceVersion = None,
                   fieldPath = None
                 ),
-                lastTriggeredImage = ImageName(
-                  "andyshinn/dnsmasq@sha256:e219b6a321579580aad06782f048dddb907ea990f86231ca0517a406853dc2eb")
+                lastTriggeredImage = Some(ImageName(
+                  "andyshinn/dnsmasq@sha256:e219b6a321579580aad06782f048dddb907ea990f86231ca0517a406853dc2eb"))
               ))
             )
           ),
@@ -214,7 +214,7 @@ class DeploymentConfigTest extends FreeSpec with Matchers {
                   Container(
                     image = ImageName(
                       "andyshinn/dnsmasq@sha256:e219b6a321579580aad06782f048dddb907ea990f86231ca0517a406853dc2eb"),
-                    imagePullPolicy = "Always",
+                    imagePullPolicy = Some("Always"),
                     args = None,
                     command = None,
                     env = None,

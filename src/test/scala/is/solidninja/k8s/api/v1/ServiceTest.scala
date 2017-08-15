@@ -73,13 +73,13 @@ class ServiceTest extends FreeSpec with Matchers {
       )
 
       val serviceSpec = ServiceSpec(
-        `type` = "ClusterIP",
+        `type` = Some("ClusterIP"),
         sessionAffinity = Some("None"),
         selector = Some(Selector(Map("deploymentconfig" -> Json.fromString("dnsmasq")))),
         ports = Some(
           List(
-            ServicePort("53-tcp", Port(53), "TCP", Port(53)),
-            ServicePort("53-udp", Port(53), "UDP", Port(53))
+            ServicePort("53-tcp", Port(53), Some("TCP"), Port(53)),
+            ServicePort("53-udp", Port(53), Some("UDP"), Port(53))
           ))
       )
 
@@ -111,7 +111,7 @@ class ServiceTest extends FreeSpec with Matchers {
       val service = Service(
         metadata = Some(meta),
         spec = ServiceSpec(
-          `type` = "ClusterIP"
+          `type` = Some("ClusterIP")
         )
       )
 

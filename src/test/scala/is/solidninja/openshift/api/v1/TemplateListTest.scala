@@ -40,7 +40,7 @@ class TemplateListTest extends FreeSpec with Matchers {
             name = Some("dnsmasq")
           )),
         spec = ServiceSpec(
-          `type` = "ClusterIP"
+          `type` = Some("ClusterIP")
         )
       )
       val expected = TemplateList(

@@ -1,0 +1,207 @@
+{
+  "kind": "List",
+  "apiVersion": "v1",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "annotations": {
+          "description": "Exposes and load balances the application pods"
+        },
+        "labels": {
+          "template": "httpd-example"
+        },
+        "name": "httpd-example"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "web",
+            "port": 8080,
+            "targetPort": 8080
+          }
+        ],
+        "selector": {
+          "name": "httpd-example"
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Route",
+      "metadata": {
+        "annotations": {
+          "template.openshift.io/expose-uri": "http://{.spec.host}{.spec.path}"
+        },
+        "labels": {
+          "template": "httpd-example"
+        },
+        "name": "httpd-example"
+      },
+      "spec": {
+        "host": "",
+        "to": {
+          "kind": "Service",
+          "name": "httpd-example"
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ImageStream",
+      "metadata": {
+        "annotations": {
+          "description": "Keeps track of changes in the application image"
+        },
+        "labels": {
+          "template": "httpd-example"
+        },
+        "name": "httpd-example"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "BuildConfig",
+      "metadata": {
+        "annotations": {
+          "description": "Defines how to build the application"
+        },
+        "labels": {
+          "template": "httpd-example"
+        },
+        "name": "httpd-example"
+      },
+      "spec": {
+        "output": {
+          "to": {
+            "kind": "ImageStreamTag",
+            "name": "httpd-example:latest"
+          }
+        },
+        "source": {
+          "contextDir": "",
+          "git": {
+            "ref": "",
+            "uri": "https://github.com/openshift/httpd-ex.git"
+          },
+          "type": "Git"
+        },
+        "strategy": {
+          "sourceStrategy": {
+            "from": {
+              "kind": "ImageStreamTag",
+              "name": "httpd:2.4",
+              "namespace": "openshift"
+            }
+          },
+          "type": "Source"
+        },
+        "triggers": [
+          {
+            "type": "ImageChange"
+          },
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "github": {
+              "secret": "CbeY4NiT0IhEr0IGDNCqvmYEB4aufjrmxyMovQpM"
+            },
+            "type": "GitHub"
+          },
+          {
+            "generic": {
+              "secret": "OGD1nDba4U5j8hhcmohBNqx427vGVYiBaKUn2CM8"
+            },
+            "type": "Generic"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "DeploymentConfig",
+      "metadata": {
+        "annotations": {
+          "description": "Defines how to deploy the application server"
+        },
+        "labels": {
+          "template": "httpd-example"
+        },
+        "name": "httpd-example"
+      },
+      "spec": {
+        "test": false,
+        "replicas": 1,
+        "selector": {
+          "name": "httpd-example"
+        },
+        "strategy": {
+          "type": "Rolling"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "name": "httpd-example"
+            },
+            "name": "httpd-example"
+          },
+          "spec": {
+            "containers": [
+              {
+                "env": [],
+                "image": " ",
+                "livenessProbe": {
+                  "httpGet": {
+                    "path": "/",
+                    "port": 8080
+                  },
+                  "initialDelaySeconds": 30,
+                  "timeoutSeconds": 3
+                },
+                "name": "httpd-example",
+                "ports": [
+                  {
+                    "containerPort": 8080
+                  }
+                ],
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/",
+                    "port": 8080
+                  },
+                  "initialDelaySeconds": 3,
+                  "timeoutSeconds": 3
+                },
+                "resources": {
+                  "limits": {
+                    "memory": "512Mi"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "triggers": [
+          {
+            "imageChangeParams": {
+              "automatic": true,
+              "containerNames": [
+                "httpd-example"
+              ],
+              "from": {
+                "kind": "ImageStreamTag",
+                "name": "httpd-example:latest"
+              }
+            },
+            "type": "ImageChange"
+          },
+          {
+            "type": "ConfigChange"
+          }
+        ]
+      }
+    }
+  ]
+}

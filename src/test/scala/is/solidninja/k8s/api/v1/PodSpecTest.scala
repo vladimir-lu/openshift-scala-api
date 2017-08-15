@@ -50,7 +50,7 @@ class PodSpecTest extends FreeSpec with Matchers {
           command = None,
           env = None,
           image = ImageName("openshift/origin-deployer:v1.5.1"),
-          imagePullPolicy = "IfNotPresent",
+          imagePullPolicy = Some("IfNotPresent"),
           name = Some("deployment"),
           resources = Some(ResourceRequirements())
         ) :: Nil,

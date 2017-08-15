@@ -72,7 +72,7 @@ class TopLevelTest extends FreeSpec with Matchers {
             containers = List(
               Container(
                 image = ImageName("openshift/origin-deployer:v1.5.1"),
-                imagePullPolicy = "IfNotPresent",
+                imagePullPolicy = Some("IfNotPresent"),
                 args = None,
                 command = None,
                 env = Some(Nil),
@@ -87,13 +87,13 @@ class TopLevelTest extends FreeSpec with Matchers {
         Service(
           metadata = None,
           spec = ServiceSpec(
-            `type` = "ClusterIP",
+            `type` = Some("ClusterIP"),
             sessionAffinity = Some("None"),
             selector = Some(Selector(Map("deploymentconfig" -> Json.fromString("dnsmasq")))),
             ports = Some(
               List(
-                ServicePort("53-tcp", Port(53), "TCP", Port(53)),
-                ServicePort("53-udp", Port(53), "UDP", Port(53))
+                ServicePort("53-tcp", Port(53), Some("TCP"), Port(53)),
+                ServicePort("53-udp", Port(53), Some("UDP"), Port(53))
               ))
           )
         )

@@ -3,7 +3,9 @@ package openshift
 package api
 package v1
 
+import fs2.util.Attempt
 import is.solidninja.k8s.api.v1.{Annotations, ImageName, ObjectMeta, PodSpec, ResourceRequirements, Seconds, Selector}
+import io.circe.Json
 
 sealed trait TopLevel extends HasMetadata {
   def kind: String
@@ -89,7 +91,7 @@ case class DeploymentTriggerPolicy(`type`: String, imageChangeParams: Option[Dep
 case class DeploymentTriggerImageChangeParams(automatic: Option[Boolean],
                                               containerNames: List[String],
                                               from: ObjectReference,
-                                              lastTriggeredImage: ImageName)
+                                              lastTriggeredImage: Option[ImageName])
 
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-podtemplatespec v1 PodTemplateSpec]]
@@ -132,5 +134,48 @@ case class TemplateList(items: List[EitherTopLevel], metadata: Option[ObjectMeta
   val kind = "List"
 }
 
-// FIXME: Implement template
-//case class Template(test: Any = ???)
+/**
+  * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-template v1 Template]]
+  */
+case class Template(labels: Option[Map[String, String]],
+                    message: Option[String],
+                    metadata: Option[ObjectMeta],
+                    objects: List[Json],
+                    parameters: List[Parameter])
+    extends V1Object {
+  val kind = "Template"
+}
+
+object Template {
+  implicit class TemplateExpansionOps(val template: Template) extends AnyVal {
+    def expand(parameters: Map[String, String]): Attempt[TemplateList] =
+      TemplateExpander.expandTemplate(template, parameters)
+  }
+}
+
+/**
+  * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-parameter v1 Parameter]]
+  */
+case class Parameter(name: String,
+                     displayName: Option[String] = None,
+                     description: Option[String] = None,
+                     value: Option[String] = None,
+                     generate: Option[String] = None,
+                     from: Option[String] = None,
+                     required: Option[Boolean] = None)
+
+/**
+  * FIXME - implement
+  * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-imagestream v1 ImageStream]]
+  */
+case class ImageStream(metadata: Option[ObjectMeta] = None) extends V1Object {
+  val kind = "ImageStream"
+}
+
+/**
+  * FIXME - implement
+  * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-buildconfig v1 BuildConfig]]
+  */
+case class BuildConfig(metadata: Option[ObjectMeta] = None) extends V1Object {
+  val kind = "BuildConfig"
+}

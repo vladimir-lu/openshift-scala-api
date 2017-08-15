@@ -106,7 +106,7 @@ class PodTest extends FreeSpec with Matchers {
         volumes = Some(Nil),
         containers = Container(
           image = ImageName("openshift/origin-deployer:v1.5.1"),
-          imagePullPolicy = "IfNotPresent",
+          imagePullPolicy = Some("IfNotPresent"),
           name = Some("deployment"),
           env = Some(Nil),
           resources = Some(ResourceRequirements()),

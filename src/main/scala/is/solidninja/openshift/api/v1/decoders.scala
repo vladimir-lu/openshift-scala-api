@@ -40,10 +40,20 @@ trait DecoderInstances extends is.solidninja.k8s.api.v1.DecoderInstances {
 
   implicit val decodeRouteList: Decoder[RouteList] = deriveDecoder
 
+  implicit val decodeParameter: Decoder[Parameter] = deriveDecoder
+
+  implicit val decodeTemplate: Decoder[Template] = deriveDecoder
+
+  implicit val decodeImageStream: Decoder[ImageStream] = deriveDecoder
+
+  implicit val decodeBuildConfig: Decoder[BuildConfig] = deriveDecoder
+
   implicit val decodeOapiTopLevel: Decoder[TopLevel] = for {
     kind <- Decoder[String].prepare(_.downField("kind"))
     v <- kind match {
+      case "BuildConfig" => Decoder[BuildConfig]
       case "DeploymentConfig" => Decoder[DeploymentConfig]
+      case "ImageStream" => Decoder[ImageStream]
       case "Route" => Decoder[Route]
       case _ => Decoder.failedWithMessage(s"Unknown oapi kind '$kind'")
     }

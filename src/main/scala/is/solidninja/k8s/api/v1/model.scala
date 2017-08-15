@@ -110,7 +110,7 @@ case class LocalObjectReference(name: String)
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#container-v1 Container v1]]
   */
 case class Container(image: ImageName,
-                     imagePullPolicy: String,
+                     imagePullPolicy: Option[String] = None,
                      name: Option[String] = None,
                      ports: Option[List[ContainerPort]] = None,
                      args: Option[List[String]] = None,
@@ -298,7 +298,7 @@ case class ServiceList(metadata: Option[ObjectMeta], items: List[Service]) exten
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#servicespec-v1 ServiceSpec v1]]
   */
-case class ServiceSpec(`type`: String,
+case class ServiceSpec(`type`: Option[String] = None,
                        clusterIP: Option[IPAddress] = None,
                        externalIPs: Option[IPAddress] = None,
                        externalName: Option[String] = None,
@@ -312,6 +312,6 @@ case class ServiceSpec(`type`: String,
   */
 case class ServicePort(name: String,
                        port: Port,
-                       protocol: String,
+                       protocol: Option[String],
                        targetPort: PortOrName,
                        nodePort: Option[Int] = None)

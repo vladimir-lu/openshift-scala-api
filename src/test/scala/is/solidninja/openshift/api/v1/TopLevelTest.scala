@@ -122,7 +122,7 @@ class TopLevelTest extends FreeSpec with Matchers {
                   containers = List(Container(
                     image = ImageName(
                       "andyshinn/dnsmasq@sha256:e219b6a321579580aad06782f048dddb907ea990f86231ca0517a406853dc2eb"),
-                    imagePullPolicy = "Always",
+                    imagePullPolicy = Some("Always"),
                     args = None,
                     command = None,
                     env = None,
@@ -215,13 +215,13 @@ class TopLevelTest extends FreeSpec with Matchers {
           Service(
             metadata = None,
             spec = ServiceSpec(
-              `type` = "ClusterIP",
+              `type` = Some("ClusterIP"),
               sessionAffinity = Some("None"),
               selector = Some(Selector(Map("deploymentconfig" -> Json.fromString("dnsmasq")))),
               ports = Some(
                 List(
-                  ServicePort("53-tcp", Port(53), "TCP", Port(53)),
-                  ServicePort("53-udp", Port(53), "UDP", Port(53))
+                  ServicePort("53-tcp", Port(53), Some("TCP"), Port(53)),
+                  ServicePort("53-udp", Port(53), Some("UDP"), Port(53))
                 ))
             )
           ))
