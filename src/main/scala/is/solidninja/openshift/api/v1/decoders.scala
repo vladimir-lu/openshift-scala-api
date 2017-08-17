@@ -28,8 +28,6 @@ trait DecoderInstances extends is.solidninja.k8s.api.v1.DecoderInstances {
 
   implicit val decodeDeploymentTriggerPolicy: Decoder[DeploymentTriggerPolicy] = deriveDecoder
 
-  implicit val decodePodTemplateSpec: Decoder[PodTemplateSpec] = deriveDecoder
-
   implicit val decodeRouteTargetReference: Decoder[RouteTargetReference] = deriveDecoder
 
   implicit val decodeRoutePort: Decoder[RoutePort] = deriveDecoder

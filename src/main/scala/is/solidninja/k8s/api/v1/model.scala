@@ -102,6 +102,11 @@ case class PodSpec(volumes: Option[List[Volume]],
                    subdomain: Option[String] = None)
 
 /**
+  * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-podtemplatespec v1 PodTemplateSpec]]
+  */
+case class PodTemplateSpec(metadata: Option[ObjectMeta], spec: PodSpec)
+
+/**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#localobjectreference-v1 LocalObjectReference v1]]
   */
 case class LocalObjectReference(name: String)
@@ -315,3 +320,48 @@ case class ServicePort(name: String,
                        protocol: Option[String],
                        targetPort: PortOrName,
                        nodePort: Option[Int] = None)
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#replicationcontroller-v1 ReplicationController v1]]
+  */
+case class ReplicationController(metadata: Option[ObjectMeta],
+                                 spec: ReplicationControllerSpec,
+                                 status: Option[ReplicationControllerStatus])
+    extends V1Object {
+  val kind = "ReplicationController"
+}
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#replicationcontrollerlist-v1 ReplicationControllerList v1]]
+  */
+case class ReplicationControllerList(metadata: Option[ObjectMeta], items: List[ReplicationController])
+    extends V1Object {
+  val kind = "ReplicationControllerList"
+}
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#replicationcontrollerspec-v1 ReplicationControllerSpec v1]]
+  */
+case class ReplicationControllerSpec(minReadySeconds: Option[Seconds],
+                                     replicas: Int,
+                                     selector: Option[Selector],
+                                     template: PodTemplateSpec)
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#replicationcontrollerstatus-v1 ReplicationControllerStatus v1]]
+  */
+case class ReplicationControllerStatus(availableReplicas: Int,
+                                       fullyLabeledReplicas: Int,
+                                       observedGeneration: Int,
+                                       readyReplicas: Int,
+                                       replicas: Int,
+                                       conditions: List[ReplicationControllerCondition])
+
+/**
+  * @see [[https://kubernetes.io/docs/api-reference/v1.5/#replicationcontrollercondition-v1 ReplicationControllerCondition v1]]
+  */
+case class ReplicationControllerCondition(lastTransitionTime: Timestamp,
+                                          message: String,
+                                          reason: String,
+                                          status: String,
+                                          `type`: String)

@@ -38,6 +38,9 @@ trait OpenshiftProject {
   def services(): Task[Seq[Service]]
   def service(name: String): Task[Option[Service]]
 
+  def replicationControllers(): Task[Seq[ReplicationController]]
+  def replicationController(name: String): Task[Option[ReplicationController]]
+
   def createDeploymentConfig(dc: DeploymentConfig): Task[DeploymentConfig]
   def createRoute(route: Route): Task[Route]
   def createService(service: Service): Task[Service]

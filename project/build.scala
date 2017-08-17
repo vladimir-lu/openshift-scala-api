@@ -44,7 +44,7 @@ object build {
 
   val commonSettings = mavenCentralSettings ++ Seq(
     organization := "is.solidninja.openshift",
-    version := "0.0.3",
+    version := "0.0.4",
     scalaVersion := "2.12.3",
     crossScalaVersions := Seq("2.11.11", "2.12.3"),
     scalacOptions ++= Seq(

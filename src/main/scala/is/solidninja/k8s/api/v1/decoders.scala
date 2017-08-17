@@ -71,6 +71,8 @@ trait DecoderInstances extends ValueDecoderInstances {
 
   implicit val decodePodSpec: Decoder[PodSpec] = deriveDecoder
 
+  implicit val decodePodTemplateSpec: Decoder[PodTemplateSpec] = deriveDecoder
+
   implicit val decodeKeyToPath: Decoder[KeyToPath] = deriveDecoder
 
   implicit val decodePersistentVolumeClaimSource: Decoder[PersistentVolumeClaimSource] = deriveDecoder
@@ -121,11 +123,25 @@ trait DecoderInstances extends ValueDecoderInstances {
 
   implicit val decodeServiceList: Decoder[ServiceList] = deriveDecoder
 
+  implicit val decodeReplicationController: Decoder[ReplicationController] = deriveDecoder
+
+  implicit val decodeReplicationControllerList: Decoder[ReplicationControllerList] = deriveDecoder
+
+  implicit val decodeReplicationControllerStatus: Decoder[ReplicationControllerStatus] = deriveDecoder
+
+  implicit val decodeReplicationControllerSpec: Decoder[ReplicationControllerSpec] = deriveDecoder
+
+  implicit val decodeReplicationControllerCondition: Decoder[ReplicationControllerCondition] = deriveDecoder
+
   implicit val decodeK8sTopLevel: Decoder[TopLevel] = for {
     kind <- Decoder[String].prepare(_.downField("kind"))
     v <- kind match {
       case "Pod" => Decoder[Pod]
+      case "PodList" => Decoder[PodList]
       case "Service" => Decoder[Service]
+      case "ServiceList" => Decoder[ServiceList]
+      case "ReplicationController" => Decoder[ReplicationController]
+      case "ReplicationControllerList" => Decoder[ReplicationControllerList]
       case kind => Decoder.failedWithMessage(s"Unknown k8s kind '$kind'")
     }
   } yield v

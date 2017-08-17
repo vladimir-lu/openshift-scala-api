@@ -12,6 +12,7 @@ package object v1 extends EitherSyntax {
 
   type Pod = is.solidninja.k8s.api.v1.Pod
   type Service = is.solidninja.k8s.api.v1.Service
+  type ReplicationController = is.solidninja.k8s.api.v1.ReplicationController
 
   type EitherTopLevel = Either[TopLevel, is.solidninja.k8s.api.v1.TopLevel]
 

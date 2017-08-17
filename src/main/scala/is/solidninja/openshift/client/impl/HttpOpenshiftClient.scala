@@ -3,7 +3,7 @@ package openshift
 package client
 package impl
 
-import is.solidninja.k8s.api.v1.{PodList, ServiceList}
+import is.solidninja.k8s.api.v1.{PodList, ServiceList, ReplicationControllerList}
 import is.solidninja.openshift.api.v1.{Service => v1Service, _}
 import fs2.{Strategy, Task}
 import fs2.async.immutable.Signal
@@ -42,6 +42,11 @@ private[client] class HttpOpenshiftProject(client: HttpOpenshiftClient, projectI
   override def services(): Task[Seq[v1Service]] = client.listServices(projectId)
 
   override def service(name: String): Task[Option[v1Service]] = client.getService(projectId, name)
+
+  override def replicationControllers(): Task[Seq[ReplicationController]] = client.getReplicationControllers(projectId)
+
+  override def replicationController(name: String): Task[Option[ReplicationController]] =
+    client.getReplicationController(projectId, name)
 
   override def podRaw(name: String): Task[Option[Json]] = client.getPodRaw(projectId, name)
 
@@ -116,6 +121,12 @@ private[client] class HttpOpenshiftClient(client: Client, url: Uri, token: Signa
 
   def getDeploymentConfigRaw(projectId: ProjectId, name: String): Task[Option[Json]] =
     getOpt[Json](namespace(projectId) / "deploymentconfigs" / name)
+
+  def getReplicationControllers(projectId: ProjectId): Task[Seq[ReplicationController]] =
+    get[ReplicationControllerList](namespacek8s(projectId) / "replicationcontrollers").map(_.items)
+
+  def getReplicationController(projectId: ProjectId, name: String): Task[Option[ReplicationController]] =
+    getOpt[ReplicationController](namespacek8s(projectId) / "replicationcontrollers" / name)
 
   def patchDeploymentConfig(projectId: ProjectId, name: String, thePatch: JsonPatch): Task[DeploymentConfig] =
     patch[DeploymentConfig](namespace(projectId) / "deploymentconfigs" / name, thePatch.asJson)

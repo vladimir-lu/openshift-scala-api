@@ -29,8 +29,6 @@ trait EncoderInstances extends is.solidninja.k8s.api.v1.EncoderInstances {
 
   implicit val encodeDeploymentTriggerPolicy: Encoder[DeploymentTriggerPolicy] = deriveEncoder
 
-  implicit val encodePodTemplateSpec: Encoder[PodTemplateSpec] = deriveEncoder
-
   implicit val encodeRouteTargetReference: Encoder[RouteTargetReference] = deriveEncoder
 
   implicit val encodeRoutePort: Encoder[RoutePort] = deriveEncoder

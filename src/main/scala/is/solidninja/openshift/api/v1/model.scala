@@ -4,7 +4,15 @@ package api
 package v1
 
 import fs2.util.Attempt
-import is.solidninja.k8s.api.v1.{Annotations, ImageName, ObjectMeta, PodSpec, ResourceRequirements, Seconds, Selector}
+import is.solidninja.k8s.api.v1.{
+  Annotations,
+  ImageName,
+  ObjectMeta,
+  PodTemplateSpec,
+  ResourceRequirements,
+  Seconds,
+  Selector
+}
 import io.circe.Json
 
 sealed trait TopLevel extends HasMetadata {
@@ -92,11 +100,6 @@ case class DeploymentTriggerImageChangeParams(automatic: Option[Boolean],
                                               containerNames: List[String],
                                               from: ObjectReference,
                                               lastTriggeredImage: Option[ImageName])
-
-/**
-  * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-podtemplatespec v1 PodTemplateSpec]]
-  */
-case class PodTemplateSpec(metadata: Option[ObjectMeta], spec: PodSpec)
 
 /**
   * @see [[https://docs.openshift.org/latest/rest_api/openshift_v1.html#v1-route v1 Route]]

@@ -78,6 +78,8 @@ trait EncoderInstances extends ValueEncoderInstances {
 
   implicit val encodePodSpec: Encoder[PodSpec] = deriveEncoder
 
+  implicit val encodePodTemplateSpec: Encoder[PodTemplateSpec] = deriveEncoder
+
   implicit val encodeVolume: Encoder[Volume] = deriveEncoder
 
   implicit val encodeContainerPort: Encoder[ContainerPort] = deriveEncoder
@@ -117,11 +119,25 @@ trait EncoderInstances extends ValueEncoderInstances {
   implicit val encodeServiceList: Encoder[ServiceList] =
     deriveEncoder[ServiceList].mapJsonObject(v1Object("ServiceList"))
 
+  implicit val encodeReplicationController: Encoder[ReplicationController] =
+    deriveEncoder[ReplicationController].mapJsonObject(v1Object("ReplicationController"))
+
+  implicit val encodeReplicationControllerList: Encoder[ReplicationControllerList] =
+    deriveEncoder[ReplicationControllerList].mapJsonObject(v1Object("ReplicationControllerList"))
+
+  implicit val encodeReplicationControllerStatus: Encoder[ReplicationControllerStatus] = deriveEncoder
+
+  implicit val encodeReplicationControllerSpec: Encoder[ReplicationControllerSpec] = deriveEncoder
+
+  implicit val encodeReplicationControllerCondition: Encoder[ReplicationControllerCondition] = deriveEncoder
+
   implicit val encodeTopLevel: Encoder[TopLevel] = Encoder.instance {
     case p: Pod => p.asJson
     case pl: PodList => pl.asJson
     case s: Service => s.asJson
     case sl: ServiceList => sl.asJson
+    case rc: ReplicationController => rc.asJson
+    case rl: ReplicationControllerList => rl.asJson
   }
 
   protected[solidninja] def v1Object(kind: String)(json: JsonObject): JsonObject =
