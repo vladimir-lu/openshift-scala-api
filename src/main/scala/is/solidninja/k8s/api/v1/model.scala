@@ -342,20 +342,20 @@ case class ReplicationControllerList(metadata: Option[ObjectMeta], items: List[R
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#replicationcontrollerspec-v1 ReplicationControllerSpec v1]]
   */
-case class ReplicationControllerSpec(minReadySeconds: Option[Seconds],
-                                     replicas: Int,
-                                     selector: Option[Selector],
-                                     template: PodTemplateSpec)
+case class ReplicationControllerSpec(replicas: Int,
+                                     template: PodTemplateSpec,
+                                     selector: Option[Selector] = None,
+                                     minReadySeconds: Option[Seconds] = None)
 
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#replicationcontrollerstatus-v1 ReplicationControllerStatus v1]]
   */
-case class ReplicationControllerStatus(availableReplicas: Int,
-                                       fullyLabeledReplicas: Int,
+case class ReplicationControllerStatus(replicas: Int,
                                        observedGeneration: Int,
-                                       readyReplicas: Int,
-                                       replicas: Int,
-                                       conditions: List[ReplicationControllerCondition])
+                                       availableReplicas: Option[Int] = None,
+                                       fullyLabeledReplicas: Option[Int] = None,
+                                       readyReplicas: Option[Int] = None,
+                                       conditions: Option[List[ReplicationControllerCondition]] = None)
 
 /**
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#replicationcontrollercondition-v1 ReplicationControllerCondition v1]]
