@@ -142,7 +142,7 @@ class ReplicationControllerTest extends FreeSpec with Matchers {
         status = Some(
           ReplicationControllerStatus(
             replicas = 0,
-            observedGeneration = 1
+            observedGeneration = Some(1)
           )
         )
       )

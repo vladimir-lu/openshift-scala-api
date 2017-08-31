@@ -351,7 +351,7 @@ case class ReplicationControllerSpec(replicas: Int,
   * @see [[https://kubernetes.io/docs/api-reference/v1.5/#replicationcontrollerstatus-v1 ReplicationControllerStatus v1]]
   */
 case class ReplicationControllerStatus(replicas: Int,
-                                       observedGeneration: Int,
+                                       observedGeneration: Option[Int] = None,
                                        availableReplicas: Option[Int] = None,
                                        fullyLabeledReplicas: Option[Int] = None,
                                        readyReplicas: Option[Int] = None,
