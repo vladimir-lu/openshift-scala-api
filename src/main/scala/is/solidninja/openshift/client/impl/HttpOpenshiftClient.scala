@@ -19,13 +19,12 @@ private[client] class HttpOpenshiftCluster(url: Uri, token: Signal[Task, Credent
     extends OpenshiftCluster {
   val client = new HttpOpenshiftClient(httpClient, url, token)
 
-  override def project(id: ProjectId): Task[OpenshiftProject with OpenshiftProjectRaw] =
+  override def project(id: ProjectId): Task[OpenshiftProject] =
     Task.now(new HttpOpenshiftProject(client, id))
 }
 
 private[client] class HttpOpenshiftProject(client: HttpOpenshiftClient, projectId: ProjectId)
-    extends OpenshiftProject
-    with OpenshiftProjectRaw {
+    extends OpenshiftProject {
   override def pods(): Task[Seq[Pod]] = client.listPods(projectId)
 
   override def pod(name: String): Task[Option[Pod]] = client.getPod(projectId, name)
@@ -47,14 +46,6 @@ private[client] class HttpOpenshiftProject(client: HttpOpenshiftClient, projectI
 
   override def replicationController(name: String): Task[Option[ReplicationController]] =
     client.getReplicationController(projectId, name)
-
-  override def podRaw(name: String): Task[Option[Json]] = client.getPodRaw(projectId, name)
-
-  override def routeRaw(name: String): Task[Option[Json]] = client.getRouteRaw(projectId, name)
-
-  override def deploymentConfigRaw(name: String): Task[Option[Json]] = client.getDeploymentConfigRaw(projectId, name)
-
-  override def serviceRaw(name: String): Task[Option[Json]] = client.getServiceRaw(projectId, name)
 
   override def patchDeploymentConfig(name: String, patch: JsonPatch): Task[DeploymentConfig] =
     client.patchDeploymentConfig(projectId, name, patch)
@@ -92,17 +83,11 @@ private[client] class HttpOpenshiftClient(client: Client, url: Uri, token: Signa
   def getPod(projectId: ProjectId, name: String): Task[Option[Pod]] =
     getOpt[Pod](namespacek8s(projectId) / "pods" / name)
 
-  def getPodRaw(projectId: ProjectId, name: String): Task[Option[Json]] =
-    getOpt[Json](namespacek8s(projectId) / "pods" / name)
-
   def listServices(projectId: ProjectId): Task[Seq[v1Service]] =
     get[ServiceList](namespacek8s(projectId) / "services").map(_.items)
 
   def getService(projectId: ProjectId, name: String): Task[Option[v1Service]] =
     getOpt[v1Service](namespacek8s(projectId) / "services" / name)
-
-  def getServiceRaw(projectId: ProjectId, name: String): Task[Option[Json]] =
-    getOpt[Json](namespacek8s(projectId) / "services" / name)
 
   def listRoutes(projectId: ProjectId): Task[Seq[Route]] =
     get[RouteList](namespace(projectId) / "routes").map(_.items)
@@ -110,17 +95,11 @@ private[client] class HttpOpenshiftClient(client: Client, url: Uri, token: Signa
   def getRoute(projectId: ProjectId, name: String): Task[Option[Route]] =
     getOpt[Route](namespace(projectId) / "routes" / name)
 
-  def getRouteRaw(projectId: ProjectId, name: String): Task[Option[Json]] =
-    getOpt[Json](namespace(projectId) / "routes" / name)
-
   def listDeploymentConfigs(projectId: ProjectId): Task[Seq[DeploymentConfig]] =
     get[DeploymentConfigList](namespace(projectId) / "deploymentconfigs").map(_.items)
 
   def getDeploymentConfig(projectId: ProjectId, name: String): Task[Option[DeploymentConfig]] =
     getOpt[DeploymentConfig](namespace(projectId) / "deploymentconfigs" / name)
-
-  def getDeploymentConfigRaw(projectId: ProjectId, name: String): Task[Option[Json]] =
-    getOpt[Json](namespace(projectId) / "deploymentconfigs" / name)
 
   def getReplicationControllers(projectId: ProjectId): Task[Seq[ReplicationController]] =
     get[ReplicationControllerList](namespacek8s(projectId) / "replicationcontrollers").map(_.items)

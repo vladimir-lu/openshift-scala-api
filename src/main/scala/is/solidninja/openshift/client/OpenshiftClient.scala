@@ -5,8 +5,6 @@ package client
 import fs2.Task
 import fs2.async.immutable.Signal
 
-import io.circe._
-
 import gnieh.diffson.circe._
 
 import org.http4s.{Credentials, Uri}
@@ -22,7 +20,7 @@ case class BearerToken(token: String)
 case class ProjectId(id: String)
 
 trait OpenshiftCluster {
-  def project(id: ProjectId): Task[OpenshiftProject with OpenshiftProjectRaw]
+  def project(id: ProjectId): Task[OpenshiftProject]
 }
 
 trait OpenshiftProject {
@@ -48,14 +46,6 @@ trait OpenshiftProject {
   def patchDeploymentConfig(name: String, patch: JsonPatch): Task[DeploymentConfig]
   def patchRoute(name: String, patch: JsonPatch): Task[Route]
   def patchService(name: String, patch: JsonPatch): Task[Service]
-}
-
-// TODO: experimental?
-trait OpenshiftProjectRaw {
-  def podRaw(name: String): Task[Option[Json]]
-  def routeRaw(name: String): Task[Option[Json]]
-  def deploymentConfigRaw(name: String): Task[Option[Json]]
-  def serviceRaw(name: String): Task[Option[Json]]
 }
 
 object OpenshiftCluster {
