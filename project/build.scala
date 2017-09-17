@@ -70,6 +70,14 @@ object build {
     crossVersion := CrossVersion.binary
   )
 
+  val testSettings = Seq(
+    testOptions in Test ++= List(
+      Tests.Argument(TestFrameworks.ScalaTest,
+        "-y", "org.scalatest.FreeSpec",
+        "-l", "LocalCluster")
+    )
+  )
+
   val publishSettings = Seq(
     publishTo := Some(
       if (isSnapshot.value)
