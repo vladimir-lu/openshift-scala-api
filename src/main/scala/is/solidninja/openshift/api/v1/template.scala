@@ -6,10 +6,9 @@ package v1
 import java.util.regex.Pattern
 
 import cats.implicits._
+
 import io.circe._
 import io.circe.syntax._
-import io.circe.literal._
-import fs2.util.Attempt
 
 import scala.util.matching.Regex
 
@@ -31,14 +30,14 @@ private[api] object TemplateExpander {
       extends Exception(s"Error expanding parameter $parameter: $message")
       with ParameterExpansionError
 
-  def expandTemplate(template: Template, parameters: Map[String, String]): Attempt[TemplateList] =
+  def expandTemplate(template: Template, parameters: Map[String, String]): Either[Throwable, TemplateList] =
     template.objects
       .map(expandParametersOnObject(template, parameters))
-      .sequenceU
+      .sequence
       .map(TemplateList(_, metadata = None))
 
   private def expandParametersOnObject(template: Template, overrides: Map[String, String])(
-      obj: Json): Attempt[EitherTopLevel] = {
+      obj: Json): Either[Throwable, EitherTopLevel] = {
 
     def expandKeysInField(k: String, v: Json): Either[ParameterExpansionError, (String, Json)] = v match {
       case _ if v.isString =>
@@ -51,13 +50,13 @@ private[api] object TemplateExpander {
     def expandInObject(o: JsonObject): Either[ParameterExpansionError, Json] =
       o.toList
         .map { case (k, v) => expandKeysInField(k, v) }
-        .sequenceU
-        .map(JsonObject.from(_))
+        .sequence
+        .map(JsonObject.fromFoldable(_))
         .map(Json.fromJsonObject)
 
     def expandInArray(a: Vector[Json]): Either[ParameterExpansionError, Json] =
       a.map(expandKeys)
-        .sequenceU
+        .sequence
         .map(Json.fromValues)
 
     def expandKeys(j: Json): Either[ParameterExpansionError, Json] =
@@ -105,7 +104,7 @@ private[api] object TemplateExpander {
       .matchData
       .toList
       .map(findReplacement)
-      .sequenceU
+      .sequence
       .map(performReplace)
   }
 

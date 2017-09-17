@@ -2,7 +2,7 @@ package is.solidninja
 package openshift
 package client
 
-import fs2.Strategy
+import cats.effect._
 import gnieh.diffson._
 import gnieh.diffson.circe._
 import io.circe.literal._
@@ -12,19 +12,13 @@ import is.solidninja.openshift.client.impl.OAuthClusterLogin
 import org.http4s.client.blaze.{BlazeClientConfig, PooledHttp1Client}
 import org.http4s.{BasicCredentials, Uri}
 
-import scala.concurrent.ExecutionContext
-
 // FIXME - remove this manual app from the test project and write some integration tests against minishift
 object OpenshiftClientManualApp extends App {
 
-  import ExecutionContext.Implicits.global
-
-  implicit val S: Strategy = Strategy.fromExecutionContext(implicitly[ExecutionContext])
-
-  val url = Uri.uri("https://192.168.42.131:8443")
+  val url = Uri.uri("https://localhost:8443")
   val credentials = BasicCredentials("developer", "developer")
 
-  val client = PooledHttp1Client(config = BlazeClientConfig.insecure)
+  val client = PooledHttp1Client[IO](config = BlazeClientConfig.insecure)
 
   val testPatch = JsonPatch(
     Add(path = Pointer.root / "spec" / "template" / "spec" / "containers" / "0" / "env",
@@ -51,5 +45,5 @@ object OpenshiftClientManualApp extends App {
       ))
   } yield (dc, patched)
 
-  println(res.unsafeRun())
+  println(res.unsafeRunSync())
 }

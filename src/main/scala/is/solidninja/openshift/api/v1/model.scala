@@ -3,7 +3,6 @@ package openshift
 package api
 package v1
 
-import fs2.util.Attempt
 import is.solidninja.k8s.api.v1.{
   Annotations,
   ImageName,
@@ -151,7 +150,7 @@ case class Template(labels: Option[Map[String, String]],
 
 object Template {
   implicit class TemplateExpansionOps(val template: Template) extends AnyVal {
-    def expand(parameters: Map[String, String]): Attempt[TemplateList] =
+    def expand(parameters: Map[String, String]): Either[Throwable, TemplateList] =
       TemplateExpander.expandTemplate(template, parameters)
   }
 }

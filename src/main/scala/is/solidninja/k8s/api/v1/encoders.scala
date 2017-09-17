@@ -12,7 +12,7 @@ import io.circe.generic.semiauto._
 private[v1] trait ValueEncoderInstances {
 
   implicit val encodeAnnotations: Encoder[Annotations] =
-    Encoder.encodeMapLike[Map, String, Json].contramap(_.v)
+    Encoder.encodeMapLike[String, Json, Map].contramap(_.v)
 
   implicit val encodeTimestamp: Encoder[Timestamp] =
     Encoder.encodeString.contramap(timestampToString)
@@ -42,7 +42,7 @@ private[v1] trait ValueEncoderInstances {
   }
 
   implicit val encodeSelector: Encoder[Selector] =
-    Encoder.encodeMapLike[Map, String, Json].contramap(_.v)
+    Encoder.encodeMapLike[String, Json, Map].contramap(_.v)
 
   implicit val encodeModeMask: Encoder[ModeMask] =
     Encoder.encodeInt.contramap(_.v)
@@ -166,7 +166,7 @@ trait JsonOps {
   private object JsonWithoutNulls {
     def removeNullFields(o: JsonObject): Json =
       Json.fromJsonObject(
-        o.fields.foldLeft(o) {
+        o.keys.foldLeft(o) {
           case (obj, field) if obj(field).exists(_.isNull) => obj.remove(field)
           case (obj, field) if obj(field).exists(o => o.isObject || o.isArray) =>
             obj.remove(field).add(field, obj(field).map(_.withoutNulls).get)

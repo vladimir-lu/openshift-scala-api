@@ -15,7 +15,7 @@ import scala.util.Try
 private[v1] trait ValueDecoderInstances {
 
   implicit val decodeAnnotations: Decoder[Annotations] =
-    Decoder.decodeMapLike[Map, String, Json].map(Annotations.apply)
+    Decoder.decodeMapLike[String, Json, Map].map(Annotations.apply)
 
   implicit val decodeTimestamp: Decoder[Timestamp] =
     Decoder.decodeString.emapTry(toTimestamp)
@@ -45,7 +45,7 @@ private[v1] trait ValueDecoderInstances {
   ).reduceLeft(_ or _)
 
   implicit val decodeSelector: Decoder[Selector] =
-    Decoder.decodeMapLike[Map, String, Json].map(Selector.apply)
+    Decoder.decodeMapLike[String, Json, Map].map(Selector.apply)
 
   implicit val decodeModeMask: Decoder[ModeMask] = Decoder.decodeInt.map(ModeMask)
 

@@ -1,17 +1,14 @@
-package is
-package solidninja
+package is.solidninja
 package openshift
 package client
 
 import java.nio.file.{Files, Paths}
 
 import io.circe._
-
-import fs2._
-
+import cats.effect._
+import cats.implicits._
 import org.http4s.client.blaze.{BlazeClientConfig, PooledHttp1Client}
 import org.scalatest.{FreeSpec, Matchers}
-
 import is.solidninja.openshift.client.impl.OAuthClusterLogin
 import is.solidninja.openshift.api.v1
 import is.solidninja.k8s.api.{v1 => k8sv1}
@@ -25,10 +22,10 @@ class LocalClusterOpenshiftClientTest extends FreeSpec with Matchers with Fs2Spe
 
     // FIXME - this test fails if app already exists - delete needs implementing
     "should be able to create a 'hello world' http service and bring it up" taggedAs LocalCluster in {
-      task {
+      io {
         withLocalCluster { cluster =>
           val app = "flask-hello-world"
-          def create(proj: OpenshiftProject)(item: v1.EitherTopLevel): Task[Unit] = item match {
+          def create(proj: OpenshiftProject, item: v1.EitherTopLevel): IO[Unit] = item match {
             case Left(dc: v1.DeploymentConfig) => proj.createDeploymentConfig(dc).map(_ => ())
             case Left(route: v1.Route) => proj.createRoute(route).map(_ => ())
             case Right(svc: k8sv1.Service) => proj.createService(svc).map(_ => ())
@@ -38,7 +35,7 @@ class LocalClusterOpenshiftClientTest extends FreeSpec with Matchers with Fs2Spe
           for {
             proj <- cluster.project(ProjectId("myproject"))
             list <- readItemList(app)
-            _ <- Task.traverse(list.items)(create(proj))
+            _ <- list.items.traverse(create(proj, _))
             dc <- proj.deploymentConfig(app)
             route <- proj.route(app)
             svc <- proj.service(app)
@@ -57,10 +54,9 @@ object LocalClusterOpenshiftClientTest {
   import v1.JsonProtocol._
 
   implicit val ec = scala.concurrent.ExecutionContext.global
-  implicit val S = Strategy.fromExecutionContext(ec)
-  implicit val httpClient = PooledHttp1Client(config = BlazeClientConfig.insecure)
+  implicit val httpClient = PooledHttp1Client[IO](config = BlazeClientConfig.insecure)
 
-  def withLocalCluster(test: (OpenshiftCluster) => Task[Unit]): Task[Unit] =
+  def withLocalCluster(test: (OpenshiftCluster) => IO[Unit]): IO[Unit] =
     for {
       token <- OAuthClusterLogin.cache(
         OAuthClusterLogin.basic(httpClient, LocalCluster.Config.uri, LocalCluster.Config.credentials))
@@ -69,12 +65,12 @@ object LocalClusterOpenshiftClientTest {
     } yield ()
 
   // FIXME - this has a lot in common with the supporting code of TemplateTest
-  def readItemList(name: String): Task[v1.TemplateList] =
+  def readItemList(name: String): IO[v1.TemplateList] =
     for {
-      uri <- Task(getClass.getResource(s"/template/$name/expanded.json")).map(_.toURI)
-      bytes <- Task(Files.readAllBytes(Paths.get(uri)))
-      parsed <- Task.fromAttempt(parser.parse(new String(bytes)))
-      list <- Task.fromAttempt(parsed.as[v1.TemplateList])
+      uri <- IO(getClass.getResource(s"/template/$name/expanded.json")).map(_.toURI)
+      bytes <- IO(Files.readAllBytes(Paths.get(uri)))
+      parsed <- parser.parse(new String(bytes)).fold(IO.raiseError, IO.pure) // FIXME common pattern with no method?
+      list <- parsed.as[v1.TemplateList].fold(IO.raiseError, IO.pure)
     } yield list
 
 }
