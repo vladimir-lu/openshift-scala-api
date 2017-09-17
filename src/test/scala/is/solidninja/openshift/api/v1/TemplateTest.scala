@@ -114,6 +114,17 @@ class TemplateTest extends FreeSpec with Matchers {
 //      template.expand(Map.empty).map(_.asJson) should equal(Right(j))
     }
   }
+
+  "the flask-hello-world template" - {
+    "should expand correctly with no parameters" in {
+      val template = TemplateTest.readTemplate("flask-hello-world")
+      val j = TemplateTest.readExpanded("flask-hello-world")
+
+      val res = template.expand(Map.empty)
+      res should equal(j.as[TemplateList])
+      res.map(_.asJson.withoutNulls) should equal(Right(j))
+    }
+  }
 }
 
 object TemplateTest {

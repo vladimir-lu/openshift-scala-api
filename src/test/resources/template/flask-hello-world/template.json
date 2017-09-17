@@ -1,0 +1,119 @@
+{
+  "kind": "Template",
+  "apiVersion": "v1",
+  "objects": [
+    {
+      "apiVersion": "v1",
+      "kind": "Route",
+      "metadata": {
+        "annotations": {
+          "template.openshift.io/expose-uri": "http://{.spec.host}{.spec.path}"
+        },
+        "labels": {
+          "app": "${NAME}"
+        },
+        "name": "${NAME}"
+      },
+      "spec": {
+        "host": "${APPLICATION_DOMAIN}",
+        "to": {
+          "kind": "Service",
+          "name": "${NAME}"
+        }
+      }
+    },
+    {
+      "kind": "Service",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "${NAME}",
+        "labels": {
+          "app": "${NAME}"
+        }
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "web",
+            "port": 8080,
+            "targetPort": 5000
+          }
+        ],
+        "selector": {
+          "app": "${NAME}"
+        }
+      }
+    },
+    {
+      "kind": "DeploymentConfig",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "${NAME}",
+        "labels": {
+          "app": "${NAME}"
+        }
+      },
+      "spec": {
+        "strategy": {
+          "type": "Rolling"
+        },
+        "triggers": [
+          {
+            "type": "ConfigChange"
+          }
+        ],
+        "replicas": 1,
+        "test": false,
+        "selector": {
+          "app": "${NAME}"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "${NAME}"
+            },
+            "name": "${NAME}"
+          },
+          "spec": {
+            "containers": [
+              {
+                "name": "${NAME}",
+                "image": "${IMAGE}",
+                "ports": [
+                  {
+                    "containerPort": 5000
+                  }
+                ]
+              }
+            ],
+            "restartPolicy": "Always",
+            "terminationGracePeriodSeconds": 30,
+            "dnsPolicy": "ClusterFirst"
+          }
+        }
+      }
+    }
+  ],
+  "parameters": [
+    {
+      "description": "The name assigned to all of the frontend objects defined in this template.",
+      "displayName": "Name",
+      "name": "NAME",
+      "required": true,
+      "value": "flask-hello-world"
+    },
+    {
+      "description": "The image that is run",
+      "displayName": "Image",
+      "name": "IMAGE",
+      "required": true,
+      "value": "tullyrankin/flask-hello-world:latest"
+    },
+    {
+      "description": "The exposed hostname that will route to the service, if left blank a value will be defaulted.",
+      "displayName": "Application Hostname",
+      "name": "APPLICATION_DOMAIN",
+      "value": ""
+    }
+  ]
+}

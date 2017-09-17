@@ -1,0 +1,97 @@
+{
+  "kind": "List",
+  "apiVersion": "v1",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "Route",
+      "metadata": {
+        "annotations": {
+          "template.openshift.io/expose-uri": "http://{.spec.host}{.spec.path}"
+        },
+        "labels": {
+          "app": "flask-hello-world"
+        },
+        "name": "flask-hello-world"
+      },
+      "spec": {
+        "host": "",
+        "to": {
+          "kind": "Service",
+          "name": "flask-hello-world"
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "labels": {
+          "app": "flask-hello-world"
+        },
+        "name": "flask-hello-world"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "web",
+            "port": 8080,
+            "targetPort": 5000
+          }
+        ],
+        "selector": {
+          "app": "flask-hello-world"
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "DeploymentConfig",
+      "metadata": {
+        "labels": {
+          "app": "flask-hello-world"
+        },
+        "name": "flask-hello-world"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "app": "flask-hello-world"
+        },
+        "strategy": {
+          "type": "Rolling"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "flask-hello-world"
+            },
+            "name": "flask-hello-world"
+          },
+          "spec": {
+            "containers": [
+              {
+                "image": "tullyrankin/flask-hello-world:latest",
+                "name": "flask-hello-world",
+                "ports": [
+                  {
+                    "containerPort": 5000
+                  }
+                ]
+              }
+            ],
+            "dnsPolicy": "ClusterFirst",
+            "restartPolicy": "Always",
+            "terminationGracePeriodSeconds": 30
+          }
+        },
+        "test": false,
+        "triggers": [
+          {
+            "type": "ConfigChange"
+          }
+        ]
+      }
+    }
+  ]
+}
